@@ -7,6 +7,14 @@ architectury {
     fabric()
 }
 
+tasks.remapJar {
+    injectAccessWidener.set(true)
+}
+
+loom {
+    accessWidenerPath.set(project(":common").loom.accessWidenerPath)
+}
+
 configurations {
     common {
         canBeResolved = true

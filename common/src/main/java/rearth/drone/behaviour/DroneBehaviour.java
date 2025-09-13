@@ -6,4 +6,7 @@ public interface DroneBehaviour {
     float getCurrentYaw();
     int getPriority();  // higher = better, scale 0 - 100
     
+    default void onStopped() {};
+    default float getExtraRoll() {return 0f;}
+    
 }

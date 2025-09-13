@@ -6,7 +6,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Box;
 import rearth.drone.DroneData;
 import rearth.util.Helpers;
@@ -18,7 +20,7 @@ import java.util.Comparator;
 public class ArrowAttackBehaviour extends PlayerSwarmBehaviour {
     
     private static final int MAX_RANGE = 25;
-    private static final int ATTACK_COOLDOWN = 16;
+    private static final int ATTACK_COOLDOWN = 24;
     
     private final LivingEntity target;
     private final PlayerEntity owner;
@@ -45,7 +47,7 @@ public class ArrowAttackBehaviour extends PlayerSwarmBehaviour {
         if (dist > MAX_RANGE) finishTask();
         
         if (attackCooldown <= 0) {
-            // fire arrow
+            // shoot arrow
             var world = owner.getWorld();
             var stack = new ItemStack(Items.ARROW);
             var targetPos = target.getEyePos().add(0, dist / 10f, 0);   // adjust target slightly up for longer distances to hit
@@ -55,7 +57,16 @@ public class ArrowAttackBehaviour extends PlayerSwarmBehaviour {
             var arrowEntity = new ArrowEntity(world, drone.currentPosition.x, drone.currentPosition.y, drone.currentPosition.z, stack, null);
             arrowEntity.setVelocity(initialVelocity);
             world.spawnEntity(arrowEntity);
-            attackCooldown = ATTACK_COOLDOWN * 2;
+            
+            attackCooldown = ATTACK_COOLDOWN;
+            
+            // particle
+            if (owner.getWorld() instanceof ServerWorld serverWorld) {
+                var forward = target.getEyePos().subtract(drone.currentPosition).normalize();
+                var particleStart = drone.currentPosition.add(forward.multiply(0.3f));
+                serverWorld.spawnParticles(ParticleTypes.SMALL_GUST, particleStart.x, particleStart.y, particleStart.z, 1, forward.x, forward.y, forward.z, 0.2f);
+            }
+            
         } else {
             attackCooldown--;
         }

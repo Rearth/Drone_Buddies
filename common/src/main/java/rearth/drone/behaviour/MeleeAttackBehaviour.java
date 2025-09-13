@@ -5,8 +5,10 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Box;
 import rearth.drone.DroneData;
 import rearth.util.Helpers;
@@ -77,6 +79,13 @@ public class MeleeAttackBehaviour implements DroneBehaviour {
                     var damage = 2; // todo
                     target.damage(new DamageSource(owner.getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(DamageTypes.PLAYER_ATTACK), owner), damage);
                     attackCooldown = ATTACK_COOLDOWN;
+                    
+                    if (owner.getWorld() instanceof ServerWorld serverWorld) {
+                        var middle = drone.currentPosition.add(target.getEyePos()).multiply(0.5f);
+                        var forward = target.getEyePos().subtract(drone.currentPosition).normalize();
+                        serverWorld.spawnParticles(ParticleTypes.SWEEP_ATTACK, middle.x, middle.y, middle.z, 1, forward.x, forward.y, forward.z, 0.2f);
+                    }
+                    
                 } else {
                     attackCooldown--;
                 }
@@ -109,6 +118,17 @@ public class MeleeAttackBehaviour implements DroneBehaviour {
         }
         
         return Helpers.calculateYaw(drone.currentPosition, target.getEyePos());
+    }
+    
+    @Override
+    public float getExtraRoll() {
+        
+        if (phase == AttackPhase.ATTACKING) {
+            var time = owner.getWorld().getTime();
+            return (float) (Math.sin(time / 2f) * 20);
+        }
+        
+        return DroneBehaviour.super.getExtraRoll();
     }
     
     @Override

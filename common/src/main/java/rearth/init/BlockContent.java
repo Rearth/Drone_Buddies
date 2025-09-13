@@ -17,7 +17,6 @@ public class BlockContent {
     
     public static final RegistrySupplier<Block> ASSEMBLER_FRAME = BLOCKS.register("frame", () -> new Block(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK)));
     public static final RegistrySupplier<Block> ASSEMBLER_CONTROLLER = BLOCKS.register("controller", () -> new ControllerBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK)));
-    
     public static void registerItems() {
         
         registerItem(ASSEMBLER_FRAME, "frame");

@@ -103,6 +103,6 @@ public class ControllerBlockEntity extends BlockEntity implements BlockEntityTic
     }
     
     private static boolean isValidDroneBlock(BlockState state) {
-        return !state.isAir() && !state.isLiquid() && !state.isOf(BlockContent.ASSEMBLER_FRAME);
+        return !state.isAir() && !state.isLiquid() && !state.isOf(BlockContent.ASSEMBLER_FRAME) && !state.isOf(BlockContent.ASSEMBLER_CONTROLLER);
     }
 }

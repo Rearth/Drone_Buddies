@@ -50,8 +50,9 @@ public class ControllerBlock extends BlockWithEntity {
         if (!world.isClient) {
             var candidate = world.getBlockEntity(pos, BlockEntitiesContent.ASSEMBLER_CONTROLLER.get());
             candidate.ifPresent(controllerBlockEntity -> controllerBlockEntity.onUse(state, player));
+            return ActionResult.SUCCESS;
         }
         
-        return super.onUse(state, world, pos, player, hit);
+        return ActionResult.SUCCESS;
     }
 }

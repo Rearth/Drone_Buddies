@@ -67,11 +67,14 @@ public class PickupBehaviour implements DroneBehaviour{
     }
     
     private void finishTask() {
+        drone.setCurrentTask(new PlayerSwarmBehaviour(drone, owner));
+    }
+    
+    @Override
+    public void onStopped() {
         if (collected && !target.isRemoved()) {
             target.setNoGravity(true);
         }
-        
-        drone.setCurrentTask(new PlayerSwarmBehaviour(drone, owner));
     }
     
     @Override

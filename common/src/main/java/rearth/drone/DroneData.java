@@ -27,6 +27,8 @@ public class DroneData implements CustomPayload {
     public @NotNull Vec3d targetPosition = Vec3d.ZERO;
     public @NotNull Vec3d currentVelocity = Vec3d.ZERO;
     private @Nullable DroneBehaviour currentTask;   // this may only be null on the client
+    public int ghostTicks = 0;
+    public int ghostWaitTime = 0;
     
     public DroneData(List<RecordedBlock> blocks, @NotNull Vec3d currentPosition, @NotNull Vec3d currentRotation, boolean glowing) {
         this(blocks, currentPosition, currentRotation, null, glowing);
@@ -66,6 +68,9 @@ public class DroneData implements CustomPayload {
     }
     
     public void setCurrentTask(@Nullable DroneBehaviour currentTask) {
+        if (this.currentTask != null) {
+            this.currentTask.onStopped();
+        }
         this.currentTask = currentTask;
     }
     

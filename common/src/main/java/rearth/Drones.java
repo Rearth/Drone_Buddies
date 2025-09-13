@@ -12,9 +12,14 @@ import rearth.init.BlockEntitiesContent;
 import rearth.init.ItemContent;
 import rearth.init.NetworkContent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public final class Drones {
     public static final String MOD_ID = "drones";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+    
+    public static final List<Runnable> DELAYED_ACTIONS = new ArrayList<>();
     
     public static Identifier id(String path) {
         return Identifier.of(MOD_ID, path);
@@ -28,8 +33,12 @@ public final class Drones {
         BlockEntitiesContent.BLOCK_ENTITIES.register();
         ItemContent.ITEMS.register();
         
-        TickEvent.SERVER_PRE.register(event -> event.getWorlds().forEach(world -> world.getPlayers().forEach(DroneController::tickPlayer)));
+        TickEvent.SERVER_POST.register(event -> event.getWorlds().forEach(world -> world.getPlayers().forEach(DroneController::tickPlayer)));
         TickEvent.SERVER_PRE.register(event -> event.getWorlds().forEach(DroneLight::removeOldLights));
+        TickEvent.SERVER_POST.register(event -> {
+            DELAYED_ACTIONS.forEach(Runnable::run);
+            DELAYED_ACTIONS.clear();
+        });
         
         PlayerEvent.ATTACK_ENTITY.register(DroneController::onPlayerAttackEntityEvent);
         

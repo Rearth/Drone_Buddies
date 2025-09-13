@@ -7,6 +7,15 @@ architectury {
     neoForge()
 }
 
+loom {
+    accessWidenerPath.set(project(":common").loom.accessWidenerPath)
+}
+
+tasks.remapJar {
+    injectAccessWidener = true
+    atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
+}
+
 configurations {
     common {
         canBeResolved = true

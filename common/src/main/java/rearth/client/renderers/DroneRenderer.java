@@ -8,7 +8,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import rearth.drone.DroneData;
+import rearth.util.FloodFill;
 
 import java.util.HashMap;
 
@@ -64,7 +66,7 @@ public class DroneRenderer {
             matrices.translate(scaledLocalOffset.x, scaledLocalOffset.y, scaledLocalOffset.z);
             matrices.scale(0.3f, 0.3f, 0.3f);
             
-            var light = WorldRenderer.getLightmapCoordinates(world, BlockPos.ofFloored(renderedDrone.currentPosition));
+            var light = getMaxLight(BlockPos.ofFloored(renderedDrone.currentPosition), world);
             
             // render baked / animated block
             MinecraftClient.getInstance().getBlockRenderManager().renderBlockAsEntity(
@@ -88,8 +90,19 @@ public class DroneRenderer {
         
     }
     
+    private static int getMaxLight(BlockPos center, World world) {
+        var bestLight = WorldRenderer.getLightmapCoordinates(world, center);
+        
+        for (var side : FloodFill.GetNeighbors(center)) {
+            var candidate = WorldRenderer.getLightmapCoordinates(world, side);
+            bestLight = Math.max(candidate, bestLight);
+        }
+        
+        return bestLight;
+    }
+    
     public static Vec3d lerp(Vec3d a, Vec3d b, float f) {
-        return new Vec3d(lerp(a.x, b.x, f), lerp(a.y, b.y, f), lerp(a.z, b.z, f));
+        return new Vec3d(lerp(a.x, b.x, f), lerp(a.y, b.y, f / 2f), lerp(a.z, b.z, f));
     }
     
     public static double lerp(double a, double b, double f) {

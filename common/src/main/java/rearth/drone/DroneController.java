@@ -9,17 +9,14 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.noise.SimplexNoiseSampler;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.Drones;
-import rearth.client.renderers.DroneRenderer;
-import rearth.drone.behaviour.ArrowAttackBehaviour;
-import rearth.drone.behaviour.DroneLight;
-import rearth.drone.behaviour.MeleeAttackBehaviour;
-import rearth.drone.behaviour.PickupBehaviour;
+import rearth.drone.behaviour.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +67,6 @@ public class DroneController {
             if (currentPriority >= sensor.getPriority()) break;
             
             if (sensor.sense(droneData, player)) {
-                System.out.println("sensor match: " + sensor.getClass().getName());
                 break;
             }
             
@@ -99,17 +95,40 @@ public class DroneController {
         // angle the model on all axis. Model forward points to the player forward, and acceleration is achieved by tilting the body in the right direction
         // this is similar to a quadcopter
         var rotationAngle = droneData.currentRotation.y;
-        if (droneData.getCurrentTask() != null)
-            rotationAngle = DroneRenderer.lerp(rotationAngle, droneData.getCurrentTask().getCurrentYaw(), 0.2f);
-        var bankX = Math.min(velocityDelta.z * -bankingFactor, 35);
-        var bankZ = Math.min(velocityDelta.x * bankingFactor, 35);
+        var bankX = Math.clamp(velocityDelta.z * -bankingFactor, -45, 45);
+        var bankZ = Math.clamp(velocityDelta.x * bankingFactor, -45, 45);
+        
+        if (droneData.getCurrentTask() != null) {
+            rotationAngle = droneData.getCurrentTask().getCurrentYaw();
+            bankX += droneData.getCurrentTask().getExtraRoll();
+        }
         
         
         droneData.currentRotation = new Vec3d(bankX, rotationAngle, bankZ);
         
         droneData.currentVelocity = currentVelocity.add(velocityDelta.multiply(accelerationPower));
         
-        droneData.currentPosition = droneData.currentPosition.add(droneData.currentVelocity.multiply(powerMultiplier / 20f));
+        var nextPosition = droneData.currentPosition.add(droneData.currentVelocity.multiply(powerMultiplier / 20f));
+        
+        var positionBlocked = !MiningSupportBehaviour.isPositionAvailableFull(player.getWorld(), droneData.currentPosition, nextPosition);
+        
+        //ghost through blocks
+        if (droneData.ghostTicks > 0) {
+            droneData.ghostTicks--;
+            droneData.currentPosition = nextPosition;
+        } else if (droneData.ghostWaitTime > 0) {   // wait for ghosting
+            droneData.ghostWaitTime--;
+            if (droneData.ghostWaitTime == 0) {
+                droneData.ghostTicks = 20;
+            }
+        } else if (positionBlocked) {  // just hit an obstacle, start ghosting CD
+            droneData.currentVelocity = Vec3d.ZERO;
+            droneData.ghostWaitTime = 14;
+        } else {    // normal movement
+            droneData.currentPosition = nextPosition;
+            droneData.ghostTicks = 0;
+            droneData.ghostWaitTime = 0;
+        }
         
     }
     
@@ -121,7 +140,6 @@ public class DroneController {
     }
     
     private static void issueAttackCommend(PlayerEntity player, DroneData droneData, LivingEntity livingEntity) {
-        Drones.LOGGER.debug("Issuing attack command: {} attack {}", player.getName(), livingEntity.getDisplayName());
         droneData.setCurrentTask(new MeleeAttackBehaviour(livingEntity, player, droneData));
     }
     
@@ -132,5 +150,14 @@ public class DroneController {
             DroneController.issueAttackCommend(player, droneCandidate.get(), livingEntity);
         
         return EventResult.pass();
+    }
+    
+    public static void onPlayerBlockBreakStart(PlayerEntity player, BlockPos blockPos) {
+        
+        var droneCandidate = getDroneOfPlayer(player);
+        if (droneCandidate.isPresent() && MiningSupportBehaviour.isValidMiningTarget(player.getWorld(), blockPos)) {
+            droneCandidate.get().setCurrentTask(new MiningSupportBehaviour(blockPos, player, droneCandidate.get()));
+        }
+        
     }
 }
