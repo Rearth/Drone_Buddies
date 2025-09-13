@@ -9,4 +9,8 @@ public interface DroneBehaviour {
     default void onStopped() {};
     default float getExtraRoll() {return 0f;}
     
+    enum BlockFunctions {
+        ARROW_LAUNCHER, LIGHT, MELEE_ATTACK, MINING_SUPPORT, PICKUP, SAW, FLIGHT
+    }
+    
 }

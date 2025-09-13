@@ -11,7 +11,9 @@ import org.jetbrains.annotations.Nullable;
 import rearth.Drones;
 import rearth.drone.behaviour.DroneBehaviour;
 import rearth.drone.behaviour.PlayerSwarmBehaviour;
+import rearth.util.Helpers;
 
+import java.util.EnumSet;
 import java.util.List;
 
 public class DroneData implements CustomPayload {
@@ -21,7 +23,6 @@ public class DroneData implements CustomPayload {
     private final List<RecordedBlock> blocks;
     public @NotNull Vec3d currentPosition;
     public @NotNull Vec3d currentRotation;  // y is vertical, z is forward, x is right
-    public final boolean glowing;
     
     // not synced
     public @NotNull Vec3d targetPosition = Vec3d.ZERO;
@@ -30,16 +31,31 @@ public class DroneData implements CustomPayload {
     public int ghostTicks = 0;
     public int ghostWaitTime = 0;
     
-    public DroneData(List<RecordedBlock> blocks, @NotNull Vec3d currentPosition, @NotNull Vec3d currentRotation, boolean glowing) {
-        this(blocks, currentPosition, currentRotation, null, glowing);
+    // non-synced properties
+    public final EnumSet<DroneBehaviour.BlockFunctions> installed;
+    public final boolean glowing;
+    public final float power;
+    
+    // used by packet codec, client only gets this data
+    public DroneData(List<RecordedBlock> blocks, @NotNull Vec3d currentPosition, @NotNull Vec3d currentRotation) {
+        this(blocks, currentPosition, currentRotation, null, false, EnumSet.of(DroneBehaviour.BlockFunctions.FLIGHT), 1f);
     }
     
-    public DroneData(List<RecordedBlock> blocks, @NotNull Vec3d currentPosition, @NotNull Vec3d currentRotation, @Nullable PlayerEntity player, boolean glowing) {
+    public DroneData(
+      List<RecordedBlock> blocks,
+      @NotNull Vec3d currentPosition,
+      @NotNull Vec3d currentRotation,
+      @Nullable PlayerEntity player,
+      boolean glowing,
+      EnumSet<DroneBehaviour.BlockFunctions> installed,
+      float power) {
         this.blocks = blocks;
         this.currentPosition = currentPosition;
         this.currentRotation = currentRotation;
         this.currentTask = new PlayerSwarmBehaviour(this, player);
         this.glowing = glowing;
+        this.installed = installed;
+        this.power = power;
     }
     
     public List<RecordedBlock> getBlocks() {
@@ -79,12 +95,10 @@ public class DroneData implements CustomPayload {
     public static PacketCodec<ByteBuf, DroneData> PACKET_CODEC = PacketCodec.tuple(
       RecordedBlock.PACKET_CODEC.collect(PacketCodecs.toList()),
       DroneData::getBlocks,
-      RecordedBlock.VEC3D_PACKET_CODEC,
+      Helpers.VEC3D_PACKET_CODEC,
       DroneData::getCurrentPosition,
-      RecordedBlock.VEC3D_PACKET_CODEC,
+      Helpers.VEC3D_PACKET_CODEC,
       DroneData::getCurrentRotation,
-      PacketCodecs.BOOL,
-      DroneData::isGlowing,
       DroneData::new
     );
 }

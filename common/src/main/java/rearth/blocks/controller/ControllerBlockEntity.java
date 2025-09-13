@@ -2,32 +2,33 @@ package rearth.blocks.controller;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import rearth.Drones;
 import rearth.drone.DroneController;
 import rearth.drone.DroneData;
 import rearth.drone.RecordedBlock;
+import rearth.drone.behaviour.DroneBehaviour;
 import rearth.init.BlockContent;
 import rearth.init.BlockEntitiesContent;
+import rearth.init.TagContent;
 import rearth.util.FloodFill;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
-public class ControllerBlockEntity extends BlockEntity implements BlockEntityTicker<ControllerBlockEntity> {
+public class ControllerBlockEntity extends BlockEntity {
+    
+    public static final float LOW_THRUSTER_POWER = 10f;
+    public static final float MEDIUM_THRUSTER_POWER = 15f;
+    public static final float HIGH_THRUSTER_POWER = 20f;
+    public static final float ULTRA_THRUSTER_POWER = 30f;
     
     public ControllerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ASSEMBLER_CONTROLLER.get(), pos, state);
-    }
-    
-    @Override
-    public void tick(World world, BlockPos pos, BlockState state, ControllerBlockEntity blockEntity) {
-        if (world.isClient) return;
     }
     
     public void onUse(BlockState state, PlayerEntity player) {
@@ -68,9 +69,63 @@ public class ControllerBlockEntity extends BlockEntity implements BlockEntityTic
             blockData.add(data);
         }
         
-        var droneData = new DroneData(blockData, player.getEyePos(), Vec3d.ZERO, player, false);
-        DroneController.PLAYER_DRONES.put(player.getName(), droneData);
+        createDroneData(blockData, droneCenter, player);
         
+    }
+    
+    private void createDroneData(List<RecordedBlock> blocks, BlockPos worldCenter, PlayerEntity player) {
+        
+        var weight = 0f;
+        var thrust = 0f;
+        var abilities = new ArrayList<DroneBehaviour.BlockFunctions>();
+        abilities.add(DroneBehaviour.BlockFunctions.FLIGHT);
+        var light = false;
+        
+        for (var recordedBlock : blocks) {
+            
+            var state = recordedBlock.state();
+            weight += state.getHardness(world, worldCenter.add(recordedBlock.localPos()));
+            
+            if (state.isIn(TagContent.LOW_THRUSTER)) {
+                thrust += LOW_THRUSTER_POWER;
+            } else if (state.isIn(TagContent.MEDIUM_THRUSTER)) {
+                thrust += MEDIUM_THRUSTER_POWER;
+            } else if (state.isIn(TagContent.HIGH_THRUSTER)) {
+                thrust += HIGH_THRUSTER_POWER;
+            } else if (state.isIn(TagContent.ULTRA_THRUSTER)) {
+                thrust += ULTRA_THRUSTER_POWER;
+            }
+            
+            if (state.isIn(TagContent.ARROW_LAUNCHER)) {
+                abilities.add(DroneBehaviour.BlockFunctions.ARROW_LAUNCHER);
+            }
+            if (state.isIn(TagContent.MELEE_DAMAGE)) {
+                abilities.add(DroneBehaviour.BlockFunctions.MELEE_ATTACK);
+            }
+            if (state.isIn(TagContent.MINING_TOOLS)) {
+                abilities.add(DroneBehaviour.BlockFunctions.MINING_SUPPORT);
+            }
+            if (state.isIn(TagContent.PICKUP_TOOLS)) {
+                abilities.add(DroneBehaviour.BlockFunctions.PICKUP);
+            }
+            if (state.isIn(TagContent.AXE_TOOLS)) {
+                abilities.add(DroneBehaviour.BlockFunctions.SAW);
+            }
+            
+            if (state.getLuminance() >  0) {
+                light = true;
+            }
+            
+        }
+        
+        var thrustRatio = thrust / weight;
+        var abilitySet = EnumSet.copyOf(abilities);
+        
+        System.out.println(thrustRatio);
+        System.out.println(abilitySet);
+        
+        var droneData = new DroneData(blocks, worldCenter.toCenterPos(), Vec3d.ZERO, player, light, abilitySet, thrustRatio);
+        DroneController.PLAYER_DRONES.put(player.getName(), droneData);
     }
     
     private static BlockPos findCenterOfMass(List<BlockPos> positions) {

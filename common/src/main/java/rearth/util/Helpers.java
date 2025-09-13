@@ -1,11 +1,47 @@
 package rearth.util;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.block.ShapeContext;
+import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
 public class Helpers {
+    
+    public static PacketCodec<ByteBuf, Vec3i> VEC3I_PACKET_CODEC = new PacketCodec<>() {
+        @Override
+        public Vec3i decode(ByteBuf buf) {
+            var x = buf.readInt();
+            var y = buf.readInt();
+            var z = buf.readInt();
+            return new Vec3i(x, y, z);
+        }
+        
+        @Override
+        public void encode(ByteBuf buf, Vec3i value) {
+            buf.writeInt(value.getX());
+            buf.writeInt(value.getY());
+            buf.writeInt(value.getZ());
+        }
+    };
+    public static PacketCodec<ByteBuf, Vec3d> VEC3D_PACKET_CODEC = new PacketCodec<>() {
+        @Override
+        public Vec3d decode(ByteBuf buf) {
+            var x = buf.readDouble();
+            var y = buf.readDouble();
+            var z = buf.readDouble();
+            return new Vec3d(x, y, z);
+        }
+        
+        @Override
+        public void encode(ByteBuf buf, Vec3d value) {
+            buf.writeDouble(value.x);
+            buf.writeDouble(value.y);
+            buf.writeDouble(value.z);
+        }
+    };
     
     // in degrees
     public static float calculateYaw(Vec3d self, Vec3d target) {

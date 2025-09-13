@@ -81,15 +81,14 @@ public class DroneController {
     
     private static void updateDroneMovement(PlayerEntity player, DroneData droneData) {
         
-        var powerMultiplier = 1f;
+        var powerMultiplier = droneData.power;
         
         var accelerationPower = 0.2f;
         var bankingFactor = 30 * Math.sqrt(powerMultiplier);
         
         var currentVelocity = droneData.currentVelocity;
         var targetOffset = droneData.targetPosition.subtract(droneData.currentPosition);
-        var desiredVelocity = targetOffset;
-        var velocityDelta = desiredVelocity.subtract(currentVelocity);
+        var velocityDelta = targetOffset.subtract(currentVelocity);
         
         // 2 movement modes:
         // horizontal thrusters only

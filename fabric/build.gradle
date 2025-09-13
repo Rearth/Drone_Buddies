@@ -13,6 +13,17 @@ tasks.remapJar {
 
 loom {
     accessWidenerPath.set(project(":common").loom.accessWidenerPath)
+
+    runs {
+        datagen {
+            inherit server
+            "Data Generation"
+            vmArg "-Dfabric-api.datagen"
+            vmArg "-Dfabric-api.datagen.output-dir=${project(":common").file("src/main/generated")}"
+            vmArg "-Dfabric-api.datagen.modid=drones"
+            runDir "build/datagen"
+        }
+    }
 }
 
 configurations {

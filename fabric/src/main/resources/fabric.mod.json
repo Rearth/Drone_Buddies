@@ -20,6 +20,9 @@
     ],
     "client": [
       "rearth.fabric.client.DronesModFabricClient"
+    ],
+    "fabric-datagen": [
+      "rearth.fabric.DronesDataGenerator"
     ]
   },
   "mixins": [
