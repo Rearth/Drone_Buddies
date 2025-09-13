@@ -18,6 +18,7 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.drone.behaviour.*;
+import rearth.util.Helpers;
 
 import java.util.HashMap;
 import java.util.List;
@@ -114,7 +115,7 @@ public class DroneController {
         
         var nextPosition = droneData.currentPosition.add(droneData.currentVelocity.multiply(powerMultiplier / 20f));
         
-        var positionBlocked = !MiningSupportBehaviour.isPositionAvailableFull(player.getWorld(), droneData.currentPosition, nextPosition);
+        var positionBlocked = !Helpers.isLineAvailable(player.getWorld(), droneData.currentPosition, nextPosition);
         
         //ghost through blocks
         if (droneData.ghostTicks > 0) {

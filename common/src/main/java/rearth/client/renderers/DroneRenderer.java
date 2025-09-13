@@ -11,6 +11,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import rearth.drone.DroneData;
 import rearth.util.FloodFill;
+import rearth.util.Helpers;
 
 import java.util.HashMap;
 
@@ -44,9 +45,9 @@ public class DroneRenderer {
             lastRot = new Vec3d(lastRot.x, adjustedY, lastRot.z);
         }
         
-        var deltaDronePos = lerp(lastPos, newPos, 0.1f);
+        var deltaDronePos = Helpers.lerp(lastPos, newPos, 0.1f);
         lastPositions.put(dronePlayer, deltaDronePos);
-        var deltaDroneRot = lerp(lastRot, newRot, 0.02f);
+        var deltaDroneRot = Helpers.lerp(lastRot, newRot, 0.02f);
         lastRotations.put(dronePlayer, deltaDroneRot);
         
         
@@ -99,14 +100,6 @@ public class DroneRenderer {
         }
         
         return bestLight;
-    }
-    
-    public static Vec3d lerp(Vec3d a, Vec3d b, float f) {
-        return new Vec3d(lerp(a.x, b.x, f), lerp(a.y, b.y, f / 2f), lerp(a.z, b.z, f));
-    }
-    
-    public static double lerp(double a, double b, double f) {
-        return a + f * (b - a);
     }
     
 }

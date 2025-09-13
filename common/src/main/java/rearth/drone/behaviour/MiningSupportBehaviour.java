@@ -1,14 +1,12 @@
 package rearth.drone.behaviour;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import rearth.Drones;
 import rearth.drone.DroneData;
@@ -153,29 +151,14 @@ public class MiningSupportBehaviour implements DroneBehaviour {
         var potentialPosB = blockCenter.add(otherSideDirection).add(playerDir.multiply(-1));
         var potentialPosC = blockCenter.add(playerDir.multiply(-2)).add(0, -0.6, 0);
         
-        if (isPositionAvailable(owner.getWorld(), potentialPosA, playerPos)) {
+        if (Helpers.isPositionAvailable(owner.getWorld(), potentialPosA, playerPos)) {
             return potentialPosA;
-        } else if (isPositionAvailable(owner.getWorld(), potentialPosB, playerPos)) {
+        } else if (Helpers.isPositionAvailable(owner.getWorld(), potentialPosB, playerPos)) {
             return potentialPosB;
         } else {
             return potentialPosC;
         }
         
-    }
-    
-    public static boolean isPositionAvailable(World world, Vec3d pos, Vec3d from) {
-        var backDir = from.subtract(pos).normalize();
-        var start = pos.add(backDir.multiply(0.5f));
-        
-        var context = new RaycastContext(start, pos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, ShapeContext.absent());
-        var result = world.raycast(context);
-        return result == null || !result.isInsideBlock();
-    }
-    
-    public static boolean isPositionAvailableFull(World world, Vec3d to, Vec3d from) {
-        var context = new RaycastContext(from, to, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, ShapeContext.absent());
-        var result = world.raycast(context);
-        return result == null || !result.isInsideBlock();
     }
     
     private enum SupportPhase {
