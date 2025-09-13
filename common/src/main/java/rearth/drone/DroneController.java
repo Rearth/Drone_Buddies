@@ -5,7 +5,9 @@ import dev.architectury.networking.NetworkManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.EntityHitResult;
@@ -15,7 +17,6 @@ import net.minecraft.util.math.noise.SimplexNoiseSampler;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import rearth.Drones;
 import rearth.drone.behaviour.*;
 
 import java.util.HashMap;
@@ -23,6 +24,9 @@ import java.util.List;
 import java.util.Optional;
 
 public class DroneController {
+    
+    // tp the drone to player if it's too far away
+    public static final int SNAP_RANGE = 30;
     
     public static final HashMap<Text, DroneData> PLAYER_DRONES = new HashMap<>();
     
@@ -124,10 +128,21 @@ public class DroneController {
         } else if (positionBlocked) {  // just hit an obstacle, start ghosting CD
             droneData.currentVelocity = Vec3d.ZERO;
             droneData.ghostWaitTime = 14;
+            
+            if (player.getWorld() instanceof ServerWorld serverWorld) {
+                var middle = droneData.currentPosition;
+                serverWorld.spawnParticles(ParticleTypes.PORTAL, middle.x, middle.y, middle.z, 15, 0, 0, 0, 0.2f);
+            }
         } else {    // normal movement
             droneData.currentPosition = nextPosition;
             droneData.ghostTicks = 0;
             droneData.ghostWaitTime = 0;
+        }
+        
+        // tp to player if too far away
+        var playerDist = droneData.currentPosition.distanceTo(player.getEyePos());
+        if (playerDist > SNAP_RANGE) {
+            droneData.currentPosition = player.getEyePos();
         }
         
     }
