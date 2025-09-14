@@ -21,7 +21,6 @@ import rearth.drone.behaviour.*;
 import rearth.util.Helpers;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
 
 public class DroneController {
@@ -44,7 +43,9 @@ public class DroneController {
     
     public static void updateDrone(PlayerEntity player, DroneData droneData) {
         
-        if (droneData.getCurrentTask() == null) return; // this should never happen
+        if (droneData.getCurrentTask() == null) {
+            droneData.setCurrentTask(new PlayerSwarmBehaviour(droneData, player));
+        }
         
         if (droneData.isGlowing()) {
             DroneLight.updateDroneLight(droneData, player.getWorld());
@@ -60,15 +61,8 @@ public class DroneController {
     private static void updateDroneSensors(PlayerEntity player, DroneData droneData) {
         var currentPriority = droneData.getCurrentTask().getPriority();
         
-        // this should be sorted by priority
-        var sensors = List.of(
-          new ArrowAttackBehaviour.ArrowAttackSensor(),
-          // new MeleeAttackBehaviour.MeleeAttackSensor(),
-          new PickupBehaviour.PickupSensor()
-        );
-        
         // if a sensor matches, stop the search
-        for (var sensor : sensors) {
+        for (var sensor : droneData.enabledSensors) {
             if (currentPriority >= sensor.getPriority()) break;
             
             if (sensor.sense(droneData, player)) {
@@ -155,7 +149,9 @@ public class DroneController {
     }
     
     private static void issueAttackCommend(PlayerEntity player, DroneData droneData, LivingEntity livingEntity) {
-        droneData.setCurrentTask(new MeleeAttackBehaviour(livingEntity, player, droneData));
+        
+        if (droneData.installed.contains(DroneBehaviour.BlockFunctions.MELEE_ATTACK))
+            droneData.setCurrentTask(new MeleeAttackBehaviour(livingEntity, player, droneData));
     }
     
     public static EventResult onPlayerAttackEntityEvent(PlayerEntity player, World world, Entity entity, Hand hand, @Nullable EntityHitResult entityHitResult) {
@@ -171,7 +167,8 @@ public class DroneController {
         
         var droneCandidate = getDroneOfPlayer(player);
         if (droneCandidate.isPresent() && MiningSupportBehaviour.isValidMiningTarget(player.getWorld(), blockPos)) {
-            droneCandidate.get().setCurrentTask(new MiningSupportBehaviour(blockPos, player, droneCandidate.get()));
+            if (droneCandidate.get().installed.contains(DroneBehaviour.BlockFunctions.MINING_SUPPORT))
+                droneCandidate.get().setCurrentTask(new MiningSupportBehaviour(blockPos, player, droneCandidate.get()));
         }
         
     }

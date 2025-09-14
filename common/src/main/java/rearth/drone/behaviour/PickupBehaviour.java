@@ -1,11 +1,16 @@
 package rearth.drone.behaviour;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3i;
 import rearth.drone.DroneData;
+import rearth.drone.RecordedBlock;
+import rearth.init.TagContent;
 import rearth.util.Helpers;
 
+import java.util.HashMap;
 import java.util.Optional;
 
 // enabled with a lodestone and observer
@@ -127,5 +132,20 @@ public class PickupBehaviour implements DroneBehaviour{
             
             return false;
         }
+    }
+    
+    public static boolean isValid(RecordedBlock block, HashMap<Vec3i, BlockState> frame) {
+        // is valid when facing down and not blocked
+        
+        var blockMatches = block.state().isIn(TagContent.PICKUP_TOOLS);
+        if (!blockMatches) return false;
+        
+        // ensure dir is free
+        for (int i = 1; i < 8; i++) {
+            if (frame.containsKey(block.localPos().down(i))) return false;
+        }
+        
+        return true;
+        
     }
 }

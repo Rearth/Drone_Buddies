@@ -21,7 +21,10 @@ public class BlockTagGenerator extends FabricTagProvider<Block> {
     protected void configure(RegistryWrapper.WrapperLookup wrapperLookup) {
         
         getOrCreateTagBuilder(TagContent.THRUSTER_BLOCKS)
-          .add(Blocks.IRON_TRAPDOOR);
+          .addOptionalTag(TagContent.LOW_THRUSTER)
+          .addOptionalTag(TagContent.MEDIUM_THRUSTER)
+          .addOptionalTag(TagContent.HIGH_THRUSTER)
+          .addOptionalTag(TagContent.ULTRA_THRUSTER);
         
         getOrCreateTagBuilder(TagContent.LOW_THRUSTER)
           .addOptionalTag(BlockTags.TRAPDOORS);

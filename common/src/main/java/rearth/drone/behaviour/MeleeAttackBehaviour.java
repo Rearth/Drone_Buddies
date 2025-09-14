@@ -1,5 +1,6 @@
 package rearth.drone.behaviour;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageTypes;
@@ -10,10 +11,14 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3i;
 import rearth.drone.DroneData;
+import rearth.drone.RecordedBlock;
+import rearth.init.TagContent;
 import rearth.util.Helpers;
 
 import java.util.Comparator;
+import java.util.HashMap;
 
 // an instance of a behaviour to attack one specific entity.
 // consists of 3 phases: move in, attack, move home
@@ -165,6 +170,21 @@ public class MeleeAttackBehaviour implements DroneBehaviour {
             
             return false;
         }
+    }
+    
+    public static boolean isValid(RecordedBlock block, HashMap<Vec3i, BlockState> frame) {
+        // is valid when facing forward (south) and not blocked
+        
+        var blockMatches = block.state().isIn(TagContent.MELEE_DAMAGE);
+        if (!blockMatches) return false;
+        
+        // ensure front is free
+        for (int i = 1; i < 8; i++) {
+            if (frame.containsKey(block.localPos().south(i))) return false;
+        }
+        
+        return true;
+        
     }
     
 }

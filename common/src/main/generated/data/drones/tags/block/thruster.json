@@ -1,5 +1,20 @@
 {
   "values": [
-    "minecraft:iron_trapdoor"
+    {
+      "id": "#drones:low_thruster",
+      "required": false
+    },
+    {
+      "id": "#drones:medium_thruster",
+      "required": false
+    },
+    {
+      "id": "#drones:strong_thruster",
+      "required": false
+    },
+    {
+      "id": "#drones:ultra_thruster",
+      "required": false
+    }
   ]
 }

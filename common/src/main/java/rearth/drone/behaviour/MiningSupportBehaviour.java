@@ -7,10 +7,15 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import rearth.Drones;
 import rearth.drone.DroneData;
+import rearth.drone.RecordedBlock;
+import rearth.init.TagContent;
 import rearth.util.Helpers;
+
+import java.util.HashMap;
 
 // lets the drone support with mining a single block.
 // this is done by moving the block to the side of the block,
@@ -168,5 +173,20 @@ public class MiningSupportBehaviour implements DroneBehaviour {
     public static boolean isValidMiningTarget(World world, BlockPos pos) {
         var state = world.getBlockState(pos);
         return !state.isAir() && !state.isLiquid() && state.getHardness(world, pos) > 0.1f;
+    }
+    
+    public static boolean isValid(RecordedBlock block, HashMap<Vec3i, BlockState> frame) {
+        // is valid when facing forward (south) and not blocked
+        
+        var blockMatches = block.state().isIn(TagContent.MINING_TOOLS);
+        if (!blockMatches) return false;
+        
+        // ensure front is free
+        for (int i = 1; i < 8; i++) {
+            if (frame.containsKey(block.localPos().south(i))) return false;
+        }
+        
+        return true;
+        
     }
 }
