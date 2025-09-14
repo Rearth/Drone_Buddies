@@ -50,6 +50,13 @@ public class DroneRenderer {
         var deltaDroneRot = Helpers.lerp(lastRot, newRot, 0.02f);
         lastRotations.put(dronePlayer, deltaDroneRot);
         
+        matrices.push();
+        matrices.translate(-camera.getPos().x, -camera.getPos().y, -camera.getPos().z);
+        matrices.translate(deltaDronePos.x, deltaDronePos.y, deltaDronePos.z);
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees((float) -deltaDroneRot.x));
+        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) -deltaDroneRot.z));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) -deltaDroneRot.y));
+        
         
         for (var blockData : renderedDrone.getBlocks()) {
             var localOffset = blockData.localPos();
@@ -57,13 +64,7 @@ public class DroneRenderer {
             
             var scaledLocalOffset = Vec3d.of(localOffset).add(-0.5f, -0.5f, -0.5f).multiply(targetScale);
             
-            
             matrices.push();
-            matrices.translate(-camera.getPos().x, -camera.getPos().y, -camera.getPos().z);
-            matrices.translate(deltaDronePos.x, deltaDronePos.y, deltaDronePos.z);
-            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees((float) -deltaDroneRot.x));
-            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) -deltaDroneRot.z));
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) -deltaDroneRot.y));
             matrices.translate(scaledLocalOffset.x, scaledLocalOffset.y, scaledLocalOffset.z);
             matrices.scale(0.3f, 0.3f, 0.3f);
             
@@ -88,6 +89,8 @@ public class DroneRenderer {
             
             matrices.pop();
         }
+        
+        matrices.pop();
         
     }
     

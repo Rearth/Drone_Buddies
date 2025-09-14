@@ -26,6 +26,7 @@ public class DroneData implements CustomPayload {
     
     // synced to client
     private final List<RecordedBlock> blocks;
+    private final int size;
     public @NotNull Vec3d currentPosition;
     public @NotNull Vec3d currentRotation;  // y is vertical, z is forward, x is right
     
@@ -61,6 +62,11 @@ public class DroneData implements CustomPayload {
         var droneFrame = new HashMap<Vec3i, BlockState>();
         blocks.forEach(block -> droneFrame.put(block.localPos(), block.state()));
         
+        var minX = 0;
+        var minZ = 0;
+        var maxX = 0;
+        var maxZ = 0;
+        
         for (var recordedBlock : blocks) {
             
             var state = recordedBlock.state();
@@ -88,17 +94,40 @@ public class DroneData implements CustomPayload {
                 light = true;
             }
             
+            var localPos = recordedBlock.localPos();
+            if (localPos.getX() < minX)
+                minX = localPos.getX();
+            if (localPos.getZ() < minZ)
+                minZ = localPos.getZ();
+            if (localPos.getX() > maxX)
+                maxX = localPos.getX();
+            if (localPos.getZ() > maxZ)
+                maxZ = localPos.getZ();
+            
         }
         
-        this.power = thrust / weight;
+        var sizeX = maxX - minX + 1;
+        var sizeZ = maxZ - minZ + 1;
+        this.size = Math.max(sizeX, sizeZ);
+        
+        var thrusterRatio = thrust / weight;
+        
+        if (thrusterRatio < 1)
+            thrusterRatio = (float) Math.sqrt(thrusterRatio);
+        
+        if (thrusterRatio > 6)
+            thrusterRatio = (float) Math.sqrt(thrusterRatio) + 3.55f;
+        
+        this.power = thrusterRatio;
         this.installed = EnumSet.copyOf(abilities);
         this.glowing = light;
         this.enabledSensors = getInstalledSensors(installed);
-        
+
 //        System.out.println(thrust + " / " + weight);
 //        System.out.println(power);
 //        System.out.println(Iterables.toString(enabledSensors));
 //        System.out.println(Iterables.toString(installed));
+        // System.out.println("Size: X:" + sizeX + " Z: " + sizeZ);
     }
     
     public List<RecordedBlock> getBlocks() {
@@ -111,6 +140,15 @@ public class DroneData implements CustomPayload {
     
     public @NotNull Vec3d getCurrentRotation() {
         return currentRotation;
+    }
+    
+    public int getSize() {
+        return size;
+    }
+    
+    public float getRenderScale() {
+        var defaultSize = 6f;
+        return defaultSize / size;
     }
     
     @Override

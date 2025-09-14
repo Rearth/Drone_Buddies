@@ -32,6 +32,9 @@ public class BlockTagGenerator extends FabricTagProvider<Block> {
         getOrCreateTagBuilder(TagContent.MEDIUM_THRUSTER)
           .add(Blocks.IRON_TRAPDOOR);
         
+        getOrCreateTagBuilder(TagContent.ULTRA_THRUSTER)
+          .add(Blocks.BRICK_SLAB);
+        
         getOrCreateTagBuilder(TagContent.ARROW_LAUNCHER)
           .add(Blocks.DISPENSER);
         

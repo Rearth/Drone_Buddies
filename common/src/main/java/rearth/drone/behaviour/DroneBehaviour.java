@@ -1,5 +1,8 @@
 package rearth.drone.behaviour;
 
+import net.minecraft.item.Item;
+import net.minecraft.item.Items;
+
 public interface DroneBehaviour {
     
     void tick();
@@ -11,6 +14,20 @@ public interface DroneBehaviour {
     
     enum BlockFunctions {
         ARROW_LAUNCHER, LIGHT, MELEE_ATTACK, MINING_SUPPORT, PICKUP, SAW, FLIGHT
+    }
+    
+    static Item getItem(BlockFunctions function) {
+        
+        return switch (function) {
+            case ARROW_LAUNCHER -> Items.BOW;
+            case LIGHT -> Items.LANTERN;
+            case MELEE_ATTACK -> Items.GOLDEN_SWORD;
+            case MINING_SUPPORT -> Items.GOLDEN_PICKAXE;
+            case PICKUP -> Items.HOPPER;
+            case SAW -> Items.SPRUCE_SAPLING;
+            case FLIGHT -> Items.ELYTRA;
+        };
+        
     }
     
 }

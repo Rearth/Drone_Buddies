@@ -6,7 +6,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import rearth.Drones;
-import rearth.drone.DroneController;
 import rearth.drone.DroneData;
 import rearth.drone.RecordedBlock;
 import rearth.init.BlockContent;
@@ -28,19 +27,27 @@ public class ControllerBlockEntity extends BlockEntity {
         super(BlockEntitiesContent.ASSEMBLER_CONTROLLER.get(), pos, state);
     }
     
-    public void onUse(BlockState state, PlayerEntity player) {
-        System.out.println("assembling drone");
+    public List<BlockPos> getPlatformBlocks() {
+        System.out.println("getting frame blocks");
         
-        var frameStart = getFrameStart();
+        var frameStart = getPlatformStart();
         
         System.out.println(frameStart);
         
-        if (frameStart.isEmpty()) return;
+        if (frameStart.isEmpty()) return List.of();
         
         var frameBlocks = FloodFill.Run(world, frameStart.get(), candidate -> candidate.isOf(BlockContent.ASSEMBLER_FRAME), 500, false);
         System.out.println("frame: " + frameBlocks);
         
-        if (frameBlocks.isEmpty()) return;
+        if (frameBlocks.isEmpty()) return List.of();
+        
+        return frameBlocks;
+    }
+    
+    public DroneData getCurrentDroneData(PlayerEntity player) {
+        var frameBlocks = getPlatformBlocks();
+        
+        if (frameBlocks.isEmpty()) return null;
         
         BlockPos droneStart = null;
         for (var frameBlock : frameBlocks) {
@@ -52,7 +59,7 @@ public class ControllerBlockEntity extends BlockEntity {
             }
         }
         
-        if (droneStart == null) return;
+        if (droneStart == null) return null;
         
         var droneBlocks = FloodFill.Run(world, droneStart, ControllerBlockEntity::isValidDroneBlock, 500, true);
         var droneCenter = findCenterOfMass(droneBlocks);
@@ -67,8 +74,8 @@ public class ControllerBlockEntity extends BlockEntity {
         }
         
         
-        var droneData = new DroneData(blockData, droneCenter.toCenterPos(), Vec3d.ZERO);
-        DroneController.PLAYER_DRONES.put(player.getName(), droneData);
+        return new DroneData(blockData, droneCenter.toCenterPos(), Vec3d.ZERO);
+        // DroneController.PLAYER_DRONES.put(player.getName(), droneData);
         
     }
     
@@ -93,7 +100,7 @@ public class ControllerBlockEntity extends BlockEntity {
         return BlockPos.ofFloored(realCOM);
     }
     
-    private Optional<BlockPos> getFrameStart() {
+    private Optional<BlockPos> getPlatformStart() {
         for (var neighbor : FloodFill.GetHorizontalNeighbors(pos)) {
             if (world.getBlockState(neighbor).isOf(BlockContent.ASSEMBLER_FRAME)) return Optional.of(neighbor);
         }
