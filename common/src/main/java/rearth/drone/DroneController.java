@@ -103,6 +103,15 @@ public class DroneController {
         var bankX = Math.clamp(velocityDelta.z * -bankingFactor, -45, 45);
         var bankZ = Math.clamp(velocityDelta.x * bankingFactor, -45, 45);
         
+        var acceleration = velocityDelta.length();
+        var spawnChance = acceleration - 0.5f;
+        
+        if (player.getWorld().getRandom().nextFloat() < spawnChance && player.getWorld() instanceof ServerWorld serverWorld) {
+            serverWorld.spawnParticles(ParticleTypes.SMALL_GUST, serverData.currentPosition.x, serverData.currentPosition.y - 0.2f, serverData.currentPosition.z, 1,
+              0.1f, 0.1, 0.1,
+              0.1f);
+        }
+        
         if (serverData.getCurrentTask() != null) {
             rotationAngle = serverData.getCurrentTask().getCurrentYaw();
             bankX += serverData.getCurrentTask().getExtraRoll();
