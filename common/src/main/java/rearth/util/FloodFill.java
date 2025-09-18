@@ -8,10 +8,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 public class FloodFill {
     
-    public static List<BlockPos> Run(World world, BlockPos start, Predicate<BlockState> filter, int maxCount, boolean allowDiagonal) {
+    public static List<BlockPos> Run(World world, BlockPos start, Predicate<BlockState> filter, Predicate<BlockPos> positionFilter, int maxCount, boolean allowDiagonal) {
         
         var checked = new HashSet<BlockPos>();
         var results = new ArrayList<BlockPos>();
@@ -32,7 +33,7 @@ public class FloodFill {
                     results.add(checkPos);
                     
                     // add neighbors to next set
-                    nextSet.addAll(List.of(GetNeighbors(checkPos, allowDiagonal)));
+                    nextSet.addAll(Stream.of(GetNeighbors(checkPos, allowDiagonal)).filter(positionFilter).toList());
                     
                 }
             }

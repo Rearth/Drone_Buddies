@@ -1,6 +1,7 @@
 package rearth.client.ui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import dev.architectury.networking.NetworkManager;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -8,11 +9,14 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.client.toast.SystemToast;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
@@ -20,12 +24,12 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import rearth.Drones;
+import rearth.blocks.controller.ControllerBlockEntity;
 import rearth.drone.DroneData;
 import rearth.drone.behaviour.DroneBehaviour;
 
@@ -44,15 +48,18 @@ public class DroneCreatorScreen extends Screen {
     
     private final DroneData droneData;
     private final HashMap<Vec3i, BlockEntity> renderedEntities = new HashMap<>();
-    private final float openTime = System.nanoTime();
+    private float openTime = 0;
+    private final BlockPos machinePos;
     
     private float previewAngle = 0;
+    private TextFieldWidget nameField;
     
-    public DroneCreatorScreen(DroneData data) {
+    public DroneCreatorScreen(DroneData data, BlockPos machinePos) {
         super(Text.empty());
+        this.machinePos = machinePos;
         
         if (data == null)
-            data = new DroneData(List.of(), Vec3d.ZERO, Vec3d.ZERO);
+            data = new DroneData(List.of(), 1, Vec3i.ZERO);
         
         this.droneData = data;
         
@@ -79,10 +86,18 @@ public class DroneCreatorScreen extends Screen {
         var backgroundStartY = centerY - (183 / 2);
         var buttonX = backgroundStartX + 154;
         var buttonY = backgroundStartY + 113;
+        var nameX = backgroundStartX + 7;
+        var nameY = backgroundStartY + 140;
         
-        var buttonWidget = new BigDroneButton(buttonX, buttonY, 138, 59, Text.literal("BUILD!").formatted(Formatting.BOLD), button -> System.out.println("Pressed!"));
+        var buttonWidget = new BigDroneButton(buttonX, buttonY, 138, 59, Text.literal("BUILD!").formatted(Formatting.BOLD), button -> {}, this);
         
         this.addDrawableChild(buttonWidget);
+        
+        nameField = new TextFieldWidget(this.textRenderer, nameX, nameY, 138, 32, Text.literal("Input"));
+        nameField.setMaxLength(32);
+        nameField.setTooltip(Tooltip.of(Text.translatable("tooltip.drones.name_field")));
+        nameField.setText("Dronie");
+        this.addDrawableChild(nameField);
         
     }
     
@@ -90,7 +105,6 @@ public class DroneCreatorScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         this.renderBackground(context, mouseX, mouseY, delta);
         
-        // openTime += delta;
         var textColor = 13685204;
         
         var centerX = this.width / 2;
@@ -164,6 +178,8 @@ public class DroneCreatorScreen extends Screen {
             context.drawText(this.textRenderer, Text.literal("No Abilities"), abilitiesStartX + 5, abilitiesStartY + 7, textColor, false);
         }
         
+        this.openTime += delta;
+        
         
     }
     
@@ -178,11 +194,10 @@ public class DroneCreatorScreen extends Screen {
     private void renderBlock(DrawContext context, Vec3i offset, BlockState state, @Nullable BlockEntity entity, float partialTicks) {
         
         var x = this.width / 2 - (300 / 2) + 70;
-        var y = this.height / 2 - 15;
+        var y = this.height / 2 - 30;
         
         var size = 20;
-        var age = System.nanoTime() - openTime;
-        var rotation = (age / 30_000_000f) % 360;
+        var rotation = (openTime * 2) % 360;
         
         var scale = droneData.getRenderScale();
         
@@ -298,12 +313,33 @@ public class DroneCreatorScreen extends Screen {
         }
     }
     
+    public void assembleDrone() {
+        
+        if (!this.droneData.isValid()) {
+            this.client.getToastManager().add(  // says "assembled, drone has been added to inv"
+              SystemToast.create(this.client, SystemToast.Type.NARRATOR_TOGGLE, Text.translatable("drone.message.invalid_drone"), Text.translatable("drone.message.invalid_drone_desc"))
+            );
+            
+            return;
+        }
+        
+        this.client.getToastManager().add(  // says "assembled, drone has been added to inv"
+          SystemToast.create(this.client, SystemToast.Type.NARRATOR_TOGGLE, Text.translatable("drone.message.assembled"), Text.translatable("drone.message.assembled_desc"))
+        );
+        
+        NetworkManager.sendToServer(new ControllerBlockEntity.AssembleDronePacket(nameField.getText(), machinePos));
+        
+        this.close();
+    }
+    
     private static class BigDroneButton extends ButtonWidget {
         
         private boolean isPressed = false;
+        private final DroneCreatorScreen parent;
         
-        protected BigDroneButton(int x, int y, int width, int height, Text message, PressAction onPress) {
+        protected BigDroneButton(int x, int y, int width, int height, Text message, PressAction onPress, DroneCreatorScreen parent) {
             super(x, y, width, height, message, onPress, ButtonWidget.DEFAULT_NARRATION_SUPPLIER);
+            this.parent = parent;
         }
         
         @Override
@@ -315,10 +351,14 @@ public class DroneCreatorScreen extends Screen {
         @Override
         public boolean mouseReleased(double mouseX, double mouseY, int button) {
             var valid = super.mouseReleased(mouseX, mouseY, button);
-            if (valid) isPressed = false;
+            if (valid && isPressed)  {
+                isPressed = false;
+                this.parent.assembleDrone();
+            }
             return valid;
         }
         
+        @SuppressWarnings("lossy-conversions")
         @Override
         protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
             

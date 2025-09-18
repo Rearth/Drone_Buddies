@@ -2,23 +2,28 @@ package rearth.drone.behaviour;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
-import rearth.drone.DroneData;
+import rearth.drone.DroneServerData;
 import rearth.util.Helpers;
 
 import static rearth.drone.DroneController.SIMPLEX;
 
 public class PlayerSwarmBehaviour implements DroneBehaviour {
     
-    private final DroneData drone;
+    private final DroneServerData drone;
     private final PlayerEntity owner;
     
-    public PlayerSwarmBehaviour(DroneData drone, PlayerEntity owner) {
+    public PlayerSwarmBehaviour(DroneServerData drone, PlayerEntity owner) {
         this.drone = drone;
         this.owner = owner;
     }
     
     @Override
     public void tick() {
+        
+        if (owner.isRemoved()) {
+            drone.setCurrentTask(null);
+        }
+        
         drone.targetPosition = getIdlePositionTarget(owner);
     }
     

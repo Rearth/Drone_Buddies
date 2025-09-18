@@ -5,7 +5,7 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3i;
-import rearth.drone.DroneData;
+import rearth.drone.DroneServerData;
 import rearth.drone.RecordedBlock;
 import rearth.init.TagContent;
 import rearth.util.Helpers;
@@ -20,13 +20,13 @@ public class PickupBehaviour implements DroneBehaviour{
     private static final float PICKUP_RANGE = 0.75f;
     
     private final PlayerEntity owner;
-    private final DroneData drone;
+    private final DroneServerData drone;
     private final ItemEntity target;
     
     private PickupPhase phase;
     private boolean collected = false;
     
-    public PickupBehaviour(PlayerEntity owner, DroneData drone, ItemEntity target) {
+    public PickupBehaviour(PlayerEntity owner, DroneServerData drone, ItemEntity target) {
         this.owner = owner;
         this.drone = drone;
         this.target = target;
@@ -123,7 +123,7 @@ public class PickupBehaviour implements DroneBehaviour{
         }
         
         @Override
-        public boolean sense(DroneData drone, PlayerEntity player) {
+        public boolean sense(DroneServerData drone, PlayerEntity player) {
             var candidate = PickupBehaviour.GetPickupTarget(player);
             if (candidate.isPresent()) {
                 drone.setCurrentTask(new PickupBehaviour(player, drone, candidate.get()));

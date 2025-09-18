@@ -12,7 +12,7 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3i;
-import rearth.drone.DroneData;
+import rearth.drone.DroneServerData;
 import rearth.drone.RecordedBlock;
 import rearth.init.TagContent;
 import rearth.util.Helpers;
@@ -29,11 +29,11 @@ public class ArrowAttackBehaviour extends PlayerSwarmBehaviour {
     
     private final LivingEntity target;
     private final PlayerEntity owner;
-    private final DroneData drone;
+    private final DroneServerData drone;
     
     private int attackCooldown = 0;
     
-    public ArrowAttackBehaviour(LivingEntity target, PlayerEntity owner, DroneData drone) {
+    public ArrowAttackBehaviour(LivingEntity target, PlayerEntity owner, DroneServerData drone) {
         super(drone, owner);
         this.target = target;
         this.owner = owner;
@@ -101,7 +101,7 @@ public class ArrowAttackBehaviour extends PlayerSwarmBehaviour {
         }
         
         @Override
-        public boolean sense(DroneData drone, PlayerEntity player) {
+        public boolean sense(DroneServerData drone, PlayerEntity player) {
             
             var world = player.getWorld();
             var entityRange = 16;

@@ -1,0 +1,19 @@
+{
+  "tooltip.drones.data_speed": "Speed: %s m/s",
+  "tooltip.drones.block_count": "Block Count: %s",
+  "tooltip.drones.data_size": "Size: %s",
+  "tooltip.drones.abilities_heading": "Abilities:",
+  "tooltip.drones.equip_hint": "Equip in Head Slot to use.",
+  "tooltip.drones.name_field": "Name of the Drone.",
+  "drones.ability.arrow_launcher": "Arrow Launcher",
+  "drones.ability.light": "Glowing",
+  "drones.ability.melee_attack": "Melee Attack",
+  "drones.ability.mining_support": "Mining Support",
+  "drones.ability.pickup": "Pickup",
+  "drones.ability.saw": "Saw",
+  "drones.ability.flight": "Flight",
+  "drone.message.invalid_drone": "Invalid Drone",
+  "drone.message.invalid_drone_desc": "Please check your drone configuration.",
+  "drone.message.assembled": "Drone Assembled",
+  "drone.message.assembled_desc": "The drone has been added to your inventory."
+}

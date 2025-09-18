@@ -22,6 +22,5 @@ public class TagContent {
     // todo abilities:
     // chest
     // tree chopping
-    // light detection
     
 }

@@ -3,12 +3,12 @@ package rearth.drone;
 import dev.architectury.event.EventResult;
 import dev.architectury.networking.NetworkManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -18,6 +18,9 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.drone.behaviour.*;
+import rearth.init.ComponentContent;
+import rearth.init.ItemContent;
+import rearth.init.NetworkContent;
 import rearth.util.Helpers;
 
 import java.util.HashMap;
@@ -28,44 +31,48 @@ public class DroneController {
     // tp the drone to player if it's too far away
     public static final int SNAP_RANGE = 30;
     
-    public static final HashMap<Text, DroneData> PLAYER_DRONES = new HashMap<>();
+    private final static HashMap<Integer, DroneServerData> WORK_DATA = new HashMap<>();
     
     public static final SimplexNoiseSampler SIMPLEX = new SimplexNoiseSampler(Random.create());
     
     public static void tickPlayer(ServerPlayerEntity playerEntity) {
         
-        if (PLAYER_DRONES.containsKey(playerEntity.getName())) {
-            var playerDrone = PLAYER_DRONES.get(playerEntity.getName());
-            updateDrone(playerEntity, playerDrone);
+        var droneCandidate = playerEntity.getEquippedStack(EquipmentSlot.HEAD);
+        if (droneCandidate.isOf(ItemContent.POCKET_DRONE.get()) && droneCandidate.contains(ComponentContent.DRONE_DATA_TYPE.get())) {
+            var droneData = droneCandidate.get(ComponentContent.DRONE_DATA_TYPE.get());
+            if (droneData == null) return;
+            
+            var serverData = WORK_DATA.computeIfAbsent(droneData.getDroneId(), droneId -> new DroneServerData(droneData, playerEntity));
+            updateDrone(playerEntity, serverData);
         }
         
     }
     
-    public static void updateDrone(PlayerEntity player, DroneData droneData) {
+    public static void updateDrone(PlayerEntity player, DroneServerData serverData) {
         
-        if (droneData.getCurrentTask() == null) {
-            droneData.setCurrentTask(new PlayerSwarmBehaviour(droneData, player));
+        if (serverData.getCurrentTask() == null) {
+            serverData.setCurrentTask(new PlayerSwarmBehaviour(serverData, player));
         }
         
-        if (droneData.isGlowing()) {
-            DroneLight.updateDroneLight(droneData, player.getWorld());
+        if (serverData.droneData.isGlowing()) {
+            DroneLight.updateDroneLight(serverData, player.getWorld());
         }
         
-        updateDroneSensors(player, droneData);
-        droneData.getCurrentTask().tick();
-        updateDroneMovement(player, droneData);
+        updateDroneSensors(player, serverData);
+        serverData.getCurrentTask().tick();
+        updateDroneMovement(player, serverData);
         
-        NetworkManager.sendToPlayer((ServerPlayerEntity) player, droneData);
+        NetworkManager.sendToPlayer((ServerPlayerEntity) player, new NetworkContent.DroneMoveSyncPacket(serverData.currentPosition, serverData.currentRotation, serverData.droneData.getDroneId()));
     }
     
-    private static void updateDroneSensors(PlayerEntity player, DroneData droneData) {
-        var currentPriority = droneData.getCurrentTask().getPriority();
+    private static void updateDroneSensors(PlayerEntity player, DroneServerData serverData) {
+        var currentPriority = serverData.getCurrentTask().getPriority();
         
         // if a sensor matches, stop the search
-        for (var sensor : droneData.enabledSensors) {
+        for (var sensor : serverData.droneData.enabledSensors) {
             if (currentPriority >= sensor.getPriority()) break;
             
-            if (sensor.sense(droneData, player)) {
+            if (sensor.sense(serverData, player)) {
                 break;
             }
             
@@ -73,15 +80,15 @@ public class DroneController {
         
     }
     
-    private static void updateDroneMovement(PlayerEntity player, DroneData droneData) {
+    private static void updateDroneMovement(PlayerEntity player, DroneServerData serverData) {
         
-        var powerMultiplier = droneData.power;
+        var powerMultiplier = serverData.droneData.power;
         
         var accelerationPower = 0.2f;
         var bankingFactor = 30 * Math.sqrt(powerMultiplier);
         
-        var currentVelocity = droneData.currentVelocity;
-        var targetOffset = droneData.targetPosition.subtract(droneData.currentPosition);
+        var currentVelocity = serverData.currentVelocity;
+        var targetOffset = serverData.targetPosition.subtract(serverData.currentPosition);
         var velocityDelta = targetOffset.subtract(currentVelocity);
         
         // 2 movement modes:
@@ -92,82 +99,100 @@ public class DroneController {
         // mode 1:
         // angle the model on all axis. Model forward points to the player forward, and acceleration is achieved by tilting the body in the right direction
         // this is similar to a quadcopter
-        var rotationAngle = droneData.currentRotation.y;
+        var rotationAngle = serverData.currentRotation.y;
         var bankX = Math.clamp(velocityDelta.z * -bankingFactor, -45, 45);
         var bankZ = Math.clamp(velocityDelta.x * bankingFactor, -45, 45);
         
-        if (droneData.getCurrentTask() != null) {
-            rotationAngle = droneData.getCurrentTask().getCurrentYaw();
-            bankX += droneData.getCurrentTask().getExtraRoll();
+        if (serverData.getCurrentTask() != null) {
+            rotationAngle = serverData.getCurrentTask().getCurrentYaw();
+            bankX += serverData.getCurrentTask().getExtraRoll();
         }
         
         
-        droneData.currentRotation = new Vec3d(bankX, rotationAngle, bankZ);
+        serverData.currentRotation = new Vec3d(bankX, rotationAngle, bankZ);
         
-        droneData.currentVelocity = currentVelocity.add(velocityDelta.multiply(accelerationPower));
+        serverData.currentVelocity = currentVelocity.add(velocityDelta.multiply(accelerationPower));
         
-        var nextPosition = droneData.currentPosition.add(droneData.currentVelocity.multiply(powerMultiplier / 20f));
+        var nextPosition = serverData.currentPosition.add(serverData.currentVelocity.multiply(powerMultiplier / 20f));
         
-        var positionBlocked = !Helpers.isLineAvailable(player.getWorld(), droneData.currentPosition, nextPosition);
+        var positionBlocked = !Helpers.isLineAvailable(player.getWorld(), serverData.currentPosition, nextPosition);
         
         //ghost through blocks
-        if (droneData.ghostTicks > 0) {
-            droneData.ghostTicks--;
-            droneData.currentPosition = nextPosition;
-        } else if (droneData.ghostWaitTime > 0) {   // wait for ghosting
-            droneData.ghostWaitTime--;
-            if (droneData.ghostWaitTime == 0) {
-                droneData.ghostTicks = 20;
+        if (serverData.ghostTicks > 0) {
+            serverData.ghostTicks--;
+            serverData.currentPosition = nextPosition;
+        } else if (serverData.ghostWaitTime > 0) {   // wait for ghosting
+            serverData.ghostWaitTime--;
+            if (serverData.ghostWaitTime == 0) {
+                serverData.ghostTicks = 20;
             }
         } else if (positionBlocked) {  // just hit an obstacle, start ghosting CD
-            droneData.currentVelocity = Vec3d.ZERO;
-            droneData.ghostWaitTime = 14;
+            serverData.currentVelocity = Vec3d.ZERO;
+            serverData.ghostWaitTime = 14;
             
             if (player.getWorld() instanceof ServerWorld serverWorld) {
-                var middle = droneData.currentPosition;
+                var middle = serverData.currentPosition;
                 serverWorld.spawnParticles(ParticleTypes.PORTAL, middle.x, middle.y, middle.z, 15, 0, 0, 0, 0.2f);
             }
         } else {    // normal movement
-            droneData.currentPosition = nextPosition;
-            droneData.ghostTicks = 0;
-            droneData.ghostWaitTime = 0;
+            serverData.currentPosition = nextPosition;
+            serverData.ghostTicks = 0;
+            serverData.ghostWaitTime = 0;
         }
         
         // tp to player if too far away
-        var playerDist = droneData.currentPosition.distanceTo(player.getEyePos());
+        var playerDist = serverData.currentPosition.distanceTo(player.getEyePos());
         if (playerDist > SNAP_RANGE) {
-            droneData.currentPosition = player.getEyePos();
+            serverData.currentPosition = player.getEyePos();
         }
         
     }
     
-    public static Optional<DroneData> getDroneOfPlayer(PlayerEntity player) {
-        if (PLAYER_DRONES.containsKey(player.getName()))
-            return Optional.of(PLAYER_DRONES.get(player.getName()));
+    public static Optional<DroneServerData> getPlayerServerData(PlayerEntity playerEntity) {
+        
+        var droneCandidate = getDroneOfPlayer(playerEntity);
+        if (playerEntity instanceof ServerPlayerEntity serverPlayer && droneCandidate.isPresent()) {
+            return Optional.of(new DroneServerData(droneCandidate.get(), serverPlayer));
+        }
         
         return Optional.empty();
     }
     
-    private static void issueAttackCommend(PlayerEntity player, DroneData droneData, LivingEntity livingEntity) {
+    public static Optional<DroneData> getDroneOfPlayer(PlayerEntity playerEntity) {
         
-        if (droneData.installed.contains(DroneBehaviour.BlockFunctions.MELEE_ATTACK))
-            droneData.setCurrentTask(new MeleeAttackBehaviour(livingEntity, player, droneData));
+        var droneCandidate = playerEntity.getEquippedStack(EquipmentSlot.HEAD);
+        if (droneCandidate.isOf(ItemContent.POCKET_DRONE.get()) && droneCandidate.contains(ComponentContent.DRONE_DATA_TYPE.get())) {
+            var droneData = droneCandidate.get(ComponentContent.DRONE_DATA_TYPE.get());
+            if (droneData == null) return Optional.empty();
+            
+            return Optional.of(droneData);
+            
+        }
+        
+        return Optional.empty();
+    }
+    
+    private static void issueAttackCommend(PlayerEntity player, DroneServerData serverData, LivingEntity livingEntity) {
+        
+        if (serverData.droneData.installed.contains(DroneBehaviour.BlockFunctions.MELEE_ATTACK))
+            serverData.setCurrentTask(new MeleeAttackBehaviour(livingEntity, player, serverData));
     }
     
     public static EventResult onPlayerAttackEntityEvent(PlayerEntity player, World world, Entity entity, Hand hand, @Nullable EntityHitResult entityHitResult) {
         
-        var droneCandidate = getDroneOfPlayer(player);
+        var droneCandidate = getPlayerServerData(player);
         if (droneCandidate.isPresent() && entity instanceof LivingEntity livingEntity)
             DroneController.issueAttackCommend(player, droneCandidate.get(), livingEntity);
+        
         
         return EventResult.pass();
     }
     
     public static void onPlayerBlockBreakStart(PlayerEntity player, BlockPos blockPos) {
         
-        var droneCandidate = getDroneOfPlayer(player);
+        var droneCandidate = getPlayerServerData(player);
         if (droneCandidate.isPresent() && MiningSupportBehaviour.isValidMiningTarget(player.getWorld(), blockPos)) {
-            if (droneCandidate.get().installed.contains(DroneBehaviour.BlockFunctions.MINING_SUPPORT))
+            if (droneCandidate.get().droneData.installed.contains(DroneBehaviour.BlockFunctions.MINING_SUPPORT))
                 droneCandidate.get().setCurrentTask(new MiningSupportBehaviour(blockPos, player, droneCandidate.get()));
         }
         

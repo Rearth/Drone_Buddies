@@ -12,7 +12,7 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3i;
-import rearth.drone.DroneData;
+import rearth.drone.DroneServerData;
 import rearth.drone.RecordedBlock;
 import rearth.init.TagContent;
 import rearth.util.Helpers;
@@ -30,12 +30,12 @@ public class MeleeAttackBehaviour implements DroneBehaviour {
     
     private final LivingEntity target;
     private final PlayerEntity owner;
-    private final DroneData drone;
+    private final DroneServerData drone;
     
     private AttackPhase phase;
     private int attackCooldown = 0;
     
-    public MeleeAttackBehaviour(LivingEntity target, PlayerEntity owner, DroneData drone) {
+    public MeleeAttackBehaviour(LivingEntity target, PlayerEntity owner, DroneServerData drone) {
         this.target = target;
         this.owner = owner;
         this.drone = drone;
@@ -153,7 +153,7 @@ public class MeleeAttackBehaviour implements DroneBehaviour {
         }
         
         @Override
-        public boolean sense(DroneData drone, PlayerEntity player) {
+        public boolean sense(DroneServerData drone, PlayerEntity player) {
             
             var world = player.getWorld();
             var entityRange = 16;

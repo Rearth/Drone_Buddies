@@ -1,14 +1,14 @@
 package rearth.drone;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.BlockState;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.dynamic.Codecs;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import rearth.Drones;
 import rearth.drone.behaviour.*;
 import rearth.init.TagContent;
@@ -21,36 +21,25 @@ import java.util.List;
 
 import static rearth.blocks.controller.ControllerBlockEntity.*;
 
-public class DroneData implements CustomPayload {
+public class DroneData {
     
-    
-    // synced to client
+    // synced to client / persisted
     private final List<RecordedBlock> blocks;
     private final int size;
-    public @NotNull Vec3d currentPosition;
-    public @NotNull Vec3d currentRotation;  // y is vertical, z is forward, x is right
-    
-    // not synced
-    public @NotNull Vec3d targetPosition = Vec3d.ZERO;
-    public @NotNull Vec3d currentVelocity = Vec3d.ZERO;
-    private @Nullable DroneBehaviour currentTask = null;   // this may only be null on the client
-    public int ghostTicks = 0;
-    public int ghostWaitTime = 0;
+    private final int droneId;
+    private final Vec3i assemblerOffset;
     
     // calculated on both sides
     public final EnumSet<DroneBehaviour.BlockFunctions> installed;
-    public final boolean glowing;
     public final float power;
     public final List<DroneSensor> enabledSensors;
     
     public DroneData(
-      @NotNull List<RecordedBlock> blocks,
-      @NotNull Vec3d currentPosition,
-      @NotNull Vec3d currentRotation) {
+      @NotNull List<RecordedBlock> blocks, int id, Vec3i assemblerOffset) {
         
         this.blocks = blocks;
-        this.currentPosition = currentPosition;
-        this.currentRotation = currentRotation;
+        this.droneId = id;
+        this.assemblerOffset = assemblerOffset;
         
         // calculate drone data
         var weight = 0f;
@@ -91,7 +80,7 @@ public class DroneData implements CustomPayload {
 //            }
             
             if (state.getLuminance() > 0) {
-                light = true;
+                abilities.add(DroneBehaviour.BlockFunctions.LIGHT);
             }
             
             var localPos = recordedBlock.localPos();
@@ -120,26 +109,11 @@ public class DroneData implements CustomPayload {
         
         this.power = thrusterRatio;
         this.installed = EnumSet.copyOf(abilities);
-        this.glowing = light;
         this.enabledSensors = getInstalledSensors(installed);
-
-//        System.out.println(thrust + " / " + weight);
-//        System.out.println(power);
-//        System.out.println(Iterables.toString(enabledSensors));
-//        System.out.println(Iterables.toString(installed));
-        // System.out.println("Size: X:" + sizeX + " Z: " + sizeZ);
     }
     
     public List<RecordedBlock> getBlocks() {
         return blocks;
-    }
-    
-    public @NotNull Vec3d getCurrentPosition() {
-        return currentPosition;
-    }
-    
-    public @NotNull Vec3d getCurrentRotation() {
-        return currentRotation;
     }
     
     public int getSize() {
@@ -151,24 +125,34 @@ public class DroneData implements CustomPayload {
         return defaultSize / size;
     }
     
-    @Override
-    public Id<? extends CustomPayload> getId() {
-        return DATA_PAYLOAD_ID;
-    }
-    
-    public @Nullable DroneBehaviour getCurrentTask() {
-        return currentTask;
-    }
-    
     public boolean isGlowing() {
-        return glowing;
+        return installed.contains(DroneBehaviour.BlockFunctions.LIGHT);
     }
     
-    public void setCurrentTask(@Nullable DroneBehaviour currentTask) {
-        if (this.currentTask != null) {
-            this.currentTask.onStopped();
-        }
-        this.currentTask = currentTask;
+    public boolean isValid() {
+        return power > 0.01f && !this.getBlocks().isEmpty();
+    }
+    
+    
+    public int getDroneId() {
+        return droneId;
+    }
+    
+    public Vec3i getAssemblerOffset() {
+        return assemblerOffset;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        
+        DroneData droneData = (DroneData) o;
+        return droneId == droneData.droneId;
+    }
+    
+    @Override
+    public int hashCode() {
+        return droneId;
     }
     
     private static List<DroneSensor> getInstalledSensors(EnumSet<DroneBehaviour.BlockFunctions> functions) {
@@ -214,15 +198,16 @@ public class DroneData implements CustomPayload {
         
     }
     
-    public static final CustomPayload.Id<DroneData> DATA_PAYLOAD_ID = new CustomPayload.Id<>(Drones.id("drone_data"));
-    
     public static PacketCodec<ByteBuf, DroneData> PACKET_CODEC = PacketCodec.tuple(
-      RecordedBlock.PACKET_CODEC.collect(PacketCodecs.toList()),
-      DroneData::getBlocks,
-      Helpers.VEC3D_PACKET_CODEC,
-      DroneData::getCurrentPosition,
-      Helpers.VEC3D_PACKET_CODEC,
-      DroneData::getCurrentRotation,
+      RecordedBlock.PACKET_CODEC.collect(PacketCodecs.toList()), DroneData::getBlocks,
+      PacketCodecs.INTEGER, DroneData::getDroneId,
+      Helpers.VEC3I_PACKET_CODEC, DroneData::getAssemblerOffset,
       DroneData::new
     );
+    
+    public static Codec<DroneData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+      RecordedBlock.CODEC.listOf().fieldOf("blocks").forGetter(DroneData::getBlocks),
+      Codecs.POSITIVE_INT.fieldOf("id").forGetter(DroneData::getDroneId),
+      Vec3i.CODEC.fieldOf("offset").forGetter(DroneData::getAssemblerOffset)
+      ).apply(instance, DroneData::new));
 }

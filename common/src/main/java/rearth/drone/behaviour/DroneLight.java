@@ -4,7 +4,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.GlobalPos;
 import net.minecraft.world.World;
-import rearth.drone.DroneData;
+import rearth.drone.DroneServerData;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,7 +13,7 @@ import java.util.Map;
 public class DroneLight {
     
     private static final Map<GlobalPos, Long> activeLights = new HashMap<>();
-    private static final Map<DroneData, BlockPos> droneLights = new HashMap<>();
+    private static final Map<DroneServerData, BlockPos> droneLights = new HashMap<>();
     
     // to ensure lights are always cleaned up
     public static void removeOldLights(World world) {
@@ -30,7 +30,7 @@ public class DroneLight {
         removed.forEach(activeLights::remove);
     }
     
-    public static void updateDroneLight(DroneData drone, World world) {
+    public static void updateDroneLight(DroneServerData drone, World world) {
         
         var targetPos = BlockPos.ofFloored(drone.currentPosition);
         var lastPos = droneLights.get(drone);
@@ -58,7 +58,7 @@ public class DroneLight {
         System.out.println("removing light: " + pos.toShortString());
     }
     
-    private static void createDroneLight(DroneData data, BlockPos pos, World world) {
+    private static void createDroneLight(DroneServerData data, BlockPos pos, World world) {
         
         var existingState = world.getBlockState(pos);
         if (!existingState.isAir()) return;

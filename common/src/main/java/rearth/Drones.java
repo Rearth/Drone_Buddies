@@ -7,10 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rearth.drone.DroneController;
 import rearth.drone.behaviour.DroneLight;
-import rearth.init.BlockContent;
-import rearth.init.BlockEntitiesContent;
-import rearth.init.ItemContent;
-import rearth.init.NetworkContent;
+import rearth.init.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +29,7 @@ public final class Drones {
         BlockContent.BLOCKS.register();
         BlockEntitiesContent.BLOCK_ENTITIES.register();
         ItemContent.ITEMS.register();
+        ComponentContent.COMPONENT_TYPES.register();
         
         TickEvent.SERVER_POST.register(event -> event.getWorlds().forEach(world -> world.getPlayers().forEach(DroneController::tickPlayer)));
         TickEvent.SERVER_PRE.register(event -> event.getWorlds().forEach(DroneLight::removeOldLights));

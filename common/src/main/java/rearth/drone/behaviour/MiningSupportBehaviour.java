@@ -10,7 +10,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import rearth.Drones;
-import rearth.drone.DroneData;
+import rearth.drone.DroneServerData;
 import rearth.drone.RecordedBlock;
 import rearth.init.TagContent;
 import rearth.util.Helpers;
@@ -28,13 +28,13 @@ public class MiningSupportBehaviour implements DroneBehaviour {
     
     private final BlockPos target;
     private final PlayerEntity owner;
-    private final DroneData drone;
+    private final DroneServerData drone;
     private final BlockState startState;
     
     private SupportPhase phase;
     private int waitTicks;
     
-    public MiningSupportBehaviour(BlockPos target, PlayerEntity owner, DroneData drone) {
+    public MiningSupportBehaviour(BlockPos target, PlayerEntity owner, DroneServerData drone) {
         this.target = target;
         this.owner = owner;
         this.drone = drone;
