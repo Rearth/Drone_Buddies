@@ -7,6 +7,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.BlockTags;
+import rearth.init.BlockContent;
 import rearth.init.TagContent;
 
 import java.util.concurrent.CompletableFuture;
@@ -27,10 +28,12 @@ public class BlockTagGenerator extends FabricTagProvider<Block> {
           .addOptionalTag(TagContent.ULTRA_THRUSTER);
         
         getOrCreateTagBuilder(TagContent.LOW_THRUSTER)
-          .addOptionalTag(BlockTags.TRAPDOORS);
+          .addOptionalTag(BlockTags.TRAPDOORS)
+          .add(BlockContent.WOOD_ROTOR.get());
         
         getOrCreateTagBuilder(TagContent.MEDIUM_THRUSTER)
-          .add(Blocks.IRON_TRAPDOOR);
+          .add(Blocks.IRON_TRAPDOOR)
+          .add(BlockContent.IRON_ROTOR.get());
         
         getOrCreateTagBuilder(TagContent.ULTRA_THRUSTER)
           .add(Blocks.BRICK_SLAB);

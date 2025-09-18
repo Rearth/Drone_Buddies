@@ -1,8 +1,10 @@
 package rearth.fabric.client;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.minecraft.client.render.RenderLayers;
 import rearth.DronesClient;
 import rearth.client.renderers.DroneRenderer;
 
@@ -11,6 +13,10 @@ public final class DronesModFabricClient implements ClientModInitializer {
     public void onInitializeClient() {
         DronesClient.init();
         WorldRenderEvents.AFTER_ENTITIES.register(DronesModFabricClient::renderWorld);
+        
+        for (var entry : DronesClient.RENDER_LAYERS.entrySet()) {
+            BlockRenderLayerMap.INSTANCE.putBlock(entry.getKey().get(), entry.getValue());
+        }
     }
     
     private static void renderWorld(WorldRenderContext worldRenderContext) {
@@ -22,4 +28,6 @@ public final class DronesModFabricClient implements ClientModInitializer {
         DroneRenderer.doRender(matrices, camera, vertexConsumers);
         
     }
+    
+    
 }

@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "drones:block/iron_rotor"
+    }
+  }
+}

@@ -31,9 +31,9 @@ import java.util.Optional;
 public class ControllerBlockEntity extends BlockEntity {
     
     public static final float LOW_THRUSTER_POWER = 10f;
-    public static final float MEDIUM_THRUSTER_POWER = 15f;
-    public static final float HIGH_THRUSTER_POWER = 20f;
-    public static final float ULTRA_THRUSTER_POWER = 30f;
+    public static final float MEDIUM_THRUSTER_POWER = 30f;
+    public static final float HIGH_THRUSTER_POWER = 50f;
+    public static final float ULTRA_THRUSTER_POWER = 70f;
     
     public ControllerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ASSEMBLER_CONTROLLER.get(), pos, state);

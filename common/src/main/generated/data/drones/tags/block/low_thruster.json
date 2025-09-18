@@ -3,6 +3,7 @@
     {
       "id": "#minecraft:trapdoors",
       "required": false
-    }
+    },
+    "drones:wood_rotor"
   ]
 }
