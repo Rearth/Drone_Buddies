@@ -11,6 +11,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -31,9 +33,9 @@ import java.util.Optional;
 public class ControllerBlockEntity extends BlockEntity {
     
     public static final float LOW_THRUSTER_POWER = 10f;
-    public static final float MEDIUM_THRUSTER_POWER = 30f;
-    public static final float HIGH_THRUSTER_POWER = 50f;
-    public static final float ULTRA_THRUSTER_POWER = 70f;
+    public static final float MEDIUM_THRUSTER_POWER = 25f;
+    public static final float HIGH_THRUSTER_POWER = 40f;
+    public static final float ULTRA_THRUSTER_POWER = 60f;
     
     public ControllerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ASSEMBLER_CONTROLLER.get(), pos, state);
@@ -148,6 +150,12 @@ public class ControllerBlockEntity extends BlockEntity {
             var offset = droneBlockData.localPos();
             var worldPos = this.pos.add(data.getAssemblerOffset()).add(offset);
             world.setBlockState(worldPos, droneBlockData.state());
+            
+            
+            if (world instanceof ServerWorld serverWorld) {
+                var spawnAt = worldPos.toCenterPos();
+                serverWorld.spawnParticles(ParticleTypes.GUST, spawnAt.x, spawnAt.y, spawnAt.z, 1, 0, 0.1f, 0, 0.5f);
+            }
         }
         
         return true;
@@ -180,6 +188,12 @@ public class ControllerBlockEntity extends BlockEntity {
         for (var droneBlock : droneData.getBlocks()) {
             var worldPos = this.pos.add(droneData.getAssemblerOffset()).add(droneBlock.localPos());
             world.setBlockState(worldPos, Blocks.AIR.getDefaultState());
+            
+            if (world instanceof ServerWorld serverWorld) {
+                var spawnAt = worldPos.toCenterPos();
+                serverWorld.spawnParticles(ParticleTypes.GUST, spawnAt.x, spawnAt.y, spawnAt.z, 1, 0, 0.1f, 0, 0.5f);
+            }
+            
         }
         
     }

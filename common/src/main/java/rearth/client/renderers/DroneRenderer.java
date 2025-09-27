@@ -40,7 +40,7 @@ public class DroneRenderer {
             
             var tickDelta = MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(false);
             
-            var targetScale = 0.1f * droneData.getRenderScale();
+            var targetScale = 0.15f * droneData.getRenderScale();
             
             var lastPos = lastPositions.computeIfAbsent(dronePlayer, player -> movementData.position());
             var lastRot = lastRotations.computeIfAbsent(dronePlayer, player -> movementData.rotation());

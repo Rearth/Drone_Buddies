@@ -15,7 +15,7 @@ import rearth.blocks.rotors.IonThruster;
 import rearth.blocks.rotors.IronRotor;
 import rearth.blocks.rotors.WoodenRotor;
 
-// todo drops, crafting recipes, tool assignments, random loot spawns?
+// todo drops, crafting recipes, random loot spawns?
 
 public class BlockContent {
     
