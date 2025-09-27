@@ -16,6 +16,7 @@ import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.sound.SoundManager;
 import net.minecraft.client.toast.SystemToast;
@@ -168,7 +169,16 @@ public class DroneCreatorScreen extends Screen {
             
             var isHovered = mouseX > startAtX && mouseX < startAtX + 20 && mouseY > abilitiesStartY && mouseY < abilitiesStartY + 20;
             if (isHovered) {
+                
                 context.drawTooltip(this.textRenderer, Text.translatable("drones.ability." + ability.name().toLowerCase()), startAtX, abilitiesStartY + 40);
+                
+                for (int i = 0; i < 5; i++) {
+                    var tooltipKey = "drones.ability." + ability.name().toLowerCase() + "." + i;
+                    if (I18n.hasTranslation(tooltipKey)) {
+                        context.drawTooltip(this.textRenderer, Text.translatable(tooltipKey), startAtX, abilitiesStartY + 40 + 11 + i * 10);
+                    }
+                }
+                
             }
             
             var renderedItem = DroneBehaviour.getItem(ability);
@@ -370,7 +380,7 @@ public class DroneCreatorScreen extends Screen {
         }
         
         public void playUpSound(SoundManager soundManager) {
-            soundManager.play(PositionedSoundInstance.master(SoundEvents.BLOCK_NETHER_WOOD_PRESSURE_PLATE_CLICK_OFF, 0.7F));
+            soundManager.play(PositionedSoundInstance.master(SoundEvents.BLOCK_BEACON_DEACTIVATE, 0.7F));
         }
         
         @SuppressWarnings("lossy-conversions")

@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "drones:block/frame"
+    }
+  }
+}

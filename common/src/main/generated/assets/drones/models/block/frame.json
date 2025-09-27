@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "drones:block/frame_down",
+    "east": "drones:block/frame_side",
+    "north": "drones:block/frame_side",
+    "particle": "drones:block/frame_side",
+    "south": "drones:block/frame_side",
+    "up": "drones:block/frame_up",
+    "west": "drones:block/frame_side"
+  }
+}
