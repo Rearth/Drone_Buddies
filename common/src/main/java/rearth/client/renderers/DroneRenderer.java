@@ -92,6 +92,7 @@ public class DroneRenderer {
                 // render optional custom entity renderer
                 if (state.getBlock() instanceof BlockEntityProvider blockEntityProvider) {
                     var blockEntity = blockEntityProvider.createBlockEntity(new BlockPos(localOffset), state);
+                    blockEntity.setWorld(world);
                     var renderer = MinecraftClient.getInstance().getBlockEntityRenderDispatcher().get(blockEntity);
                     if (renderer != null) {
                         renderer.render(blockEntity, 0, matrices, vertexConsumers, light, OverlayTexture.DEFAULT_UV);

@@ -183,6 +183,11 @@ public class DroneController {
     
     private static void issueAttackCommend(PlayerEntity player, DroneServerData serverData, LivingEntity livingEntity) {
         
+        if (serverData.droneData.installed.contains(DroneBehaviour.BlockFunctions.BEAM)) {
+            serverData.setCurrentTask(new BeamAttackBehaviour(livingEntity, player, serverData));
+            return;
+        }
+        
         if (serverData.droneData.installed.contains(DroneBehaviour.BlockFunctions.MELEE_ATTACK))
             serverData.setCurrentTask(new MeleeAttackBehaviour(livingEntity, player, serverData));
     }

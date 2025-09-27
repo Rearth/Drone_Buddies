@@ -75,6 +75,9 @@ public class DroneData {
             if (PickupBehaviour.isValid(recordedBlock, droneFrame)) {
                 abilities.add(DroneBehaviour.BlockFunctions.PICKUP);
             }
+            if (BeamAttackBehaviour.isValid(recordedBlock, droneFrame)) {
+                abilities.add(DroneBehaviour.BlockFunctions.BEAM);
+            }
 //            if (state.isIn(TagContent.AXE_TOOLS)) {
 //                abilities.add(DroneBehaviour.BlockFunctions.SAW);
 //            }
@@ -158,6 +161,8 @@ public class DroneData {
     private static List<DroneSensor> getInstalledSensors(EnumSet<DroneBehaviour.BlockFunctions> functions) {
         var sensors = new ArrayList<DroneSensor>();
         
+        if (functions.contains(DroneBehaviour.BlockFunctions.BEAM))
+            sensors.add(new BeamAttackBehaviour.BeamAttackSensor());
         if (functions.contains(DroneBehaviour.BlockFunctions.ARROW_LAUNCHER))
             sensors.add(new ArrowAttackBehaviour.ArrowAttackSensor());
         if (functions.contains(DroneBehaviour.BlockFunctions.MELEE_ATTACK))

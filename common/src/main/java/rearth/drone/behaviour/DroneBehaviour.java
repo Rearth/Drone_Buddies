@@ -13,7 +13,7 @@ public interface DroneBehaviour {
     default float getExtraRoll() {return 0f;}
     
     enum BlockFunctions {
-        ARROW_LAUNCHER, LIGHT, MELEE_ATTACK, MINING_SUPPORT, PICKUP, SAW, FLIGHT
+        ARROW_LAUNCHER, LIGHT, MELEE_ATTACK, MINING_SUPPORT, PICKUP, SAW, FLIGHT, BEAM
     }
     
     static Item getItem(BlockFunctions function) {
@@ -26,6 +26,7 @@ public interface DroneBehaviour {
             case PICKUP -> Items.HOPPER;
             case SAW -> Items.SPRUCE_SAPLING;
             case FLIGHT -> Items.ELYTRA;
+            case BEAM -> Items.BEACON;
         };
         
     }

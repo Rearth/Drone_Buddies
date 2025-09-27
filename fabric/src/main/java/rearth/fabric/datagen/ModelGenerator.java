@@ -19,7 +19,7 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerSimpleState(BlockContent.IRON_ROTOR.get());
         blockStateModelGenerator.registerSimpleState(BlockContent.ION_THRUSTER.get());
         blockStateModelGenerator.registerSimpleState(BlockContent.DRILL.get());
-        blockStateModelGenerator.registerNorthDefaultHorizontalRotation(BlockContent.ASSEMBLER_CONTROLLER.get());
+        blockStateModelGenerator.registerGeneric(BlockContent.ASSEMBLER_CONTROLLER.get());
         registerFrame(BlockContent.ASSEMBLER_FRAME.get(), blockStateModelGenerator);
     }
     

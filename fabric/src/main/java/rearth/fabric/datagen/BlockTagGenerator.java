@@ -48,6 +48,9 @@ public class BlockTagGenerator extends FabricTagProvider<Block> {
         getOrCreateTagBuilder(TagContent.PICKUP_TOOLS)
           .add(Blocks.LODESTONE);
         
+        getOrCreateTagBuilder(TagContent.BEAM_SOURCE)
+          .add(Blocks.BEACON);
+        
         getOrCreateTagBuilder(TagContent.MINING_TOOLS)
           .add(BlockContent.DRILL.get());
         

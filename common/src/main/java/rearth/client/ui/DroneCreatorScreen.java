@@ -72,9 +72,12 @@ public class DroneCreatorScreen extends Screen {
             var state = pair.state();
             if (state.getBlock() instanceof BlockEntityProvider blockEntityProvider) {
                 var blockEntity = blockEntityProvider.createBlockEntity(new BlockPos(pair.localPos()), state);
-                var renderer = MinecraftClient.getInstance().getBlockEntityRenderDispatcher().get(blockEntity);
-                if (renderer != null) {
-                    renderedEntities.put(pair.localPos(), blockEntity);
+                if (blockEntity != null && this.client != null) {
+                    blockEntity.setWorld(this.client.world);
+                    var renderer = MinecraftClient.getInstance().getBlockEntityRenderDispatcher().get(blockEntity);
+                    if (renderer != null) {
+                        renderedEntities.put(pair.localPos(), blockEntity);
+                    }
                 }
             }
         }
@@ -93,7 +96,8 @@ public class DroneCreatorScreen extends Screen {
         var nameX = backgroundStartX + 7;
         var nameY = backgroundStartY + 140;
         
-        var buttonWidget = new BigDroneButton(buttonX, buttonY, 138, 59, Text.literal("BUILD!").formatted(Formatting.BOLD), button -> {}, this);
+        var buttonWidget = new BigDroneButton(buttonX, buttonY, 138, 59, Text.literal("BUILD!").formatted(Formatting.BOLD), button -> {
+        }, this);
         
         this.addDrawableChild(buttonWidget);
         
@@ -365,7 +369,7 @@ public class DroneCreatorScreen extends Screen {
         @Override
         public boolean mouseReleased(double mouseX, double mouseY, int button) {
             var valid = super.mouseReleased(mouseX, mouseY, button);
-            if (valid && isPressed)  {
+            if (valid && isPressed) {
                 isPressed = false;
                 this.parent.assembleDrone();
                 playUpSound(MinecraftClient.getInstance().getSoundManager());
