@@ -47,11 +47,6 @@ public class BeamAttackBehaviour extends ArrowAttackBehaviour {
         var increment = to.subtract(from).multiply(1f / count);
         var particle = ParticleTypes.SONIC_BOOM;
         
-//        for (int i = 0; i < count; i++) {
-//            var pos =  from.add(increment.multiply(i));
-//            world.spawnParticles(particle, pos.getX(), pos.getY(), pos.getZ(), 1, 0, 0, 0, 0);
-//        }
-        
         world.spawnParticles(ParticleTypes.EXPLOSION, to.x, to.y, to.z, 1, 0, 0, 0, 0);
         
         int finalCount = count;

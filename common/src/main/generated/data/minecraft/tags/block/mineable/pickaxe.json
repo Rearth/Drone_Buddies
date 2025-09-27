@@ -1,0 +1,10 @@
+{
+  "values": [
+    "drones:frame",
+    "drones:controller",
+    "drones:wood_rotor",
+    "drones:iron_rotor",
+    "drones:ion_thruster",
+    "drones:drill"
+  ]
+}

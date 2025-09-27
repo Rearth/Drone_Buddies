@@ -21,6 +21,12 @@ public class BlockTagGenerator extends FabricTagProvider<Block> {
     @Override
     protected void configure(RegistryWrapper.WrapperLookup wrapperLookup) {
         
+        var pickaxeBuilder = getOrCreateTagBuilder(BlockTags.PICKAXE_MINEABLE);
+        
+        for (var supplier : BlockContent.BLOCKS) {
+            pickaxeBuilder.add(supplier.get());
+        }
+        
         getOrCreateTagBuilder(TagContent.THRUSTER_BLOCKS)
           .addOptionalTag(TagContent.LOW_THRUSTER)
           .addOptionalTag(TagContent.MEDIUM_THRUSTER)

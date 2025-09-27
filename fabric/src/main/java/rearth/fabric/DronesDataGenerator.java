@@ -2,7 +2,7 @@ package rearth.fabric;
 
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
-import rearth.Drones;
+import rearth.fabric.datagen.BlockLootGenerator;
 import rearth.fabric.datagen.BlockTagGenerator;
 import rearth.fabric.datagen.ModelGenerator;
 
@@ -16,6 +16,7 @@ public class DronesDataGenerator implements DataGeneratorEntrypoint {
         var pack = fabricDataGenerator.createPack();
         pack.addProvider(BlockTagGenerator::new);
         pack.addProvider(ModelGenerator::new);
+        pack.addProvider(BlockLootGenerator::new);
         
     }
 }
