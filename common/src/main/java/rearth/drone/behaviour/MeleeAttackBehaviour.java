@@ -97,7 +97,7 @@ public class MeleeAttackBehaviour implements DroneBehaviour {
                 
             }
             case MOVING_HOME -> {
-                drone.targetPosition = owner.getEyePos();
+                drone.targetPosition = owner.getEyePos().add(0, 0.5, 0);
                 var dist = drone.currentPosition.distanceTo(owner.getEyePos());
                 if (dist < HIT_RANGE * 2) {
                     this.finishTask();

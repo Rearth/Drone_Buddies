@@ -13,6 +13,8 @@ import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -145,6 +147,8 @@ public class ControllerBlockEntity extends BlockEntity {
             var worldState = world.getBlockState(worldPos);
             if (!worldState.isAir()) return false;
         }
+        
+        world.playSound(null, pos, SoundEvents.BLOCK_SHROOMLIGHT_PLACE, SoundCategory.BLOCKS, 1f, 1f);
         
         for (var droneBlockData : data.getBlocks()) {
             var offset = droneBlockData.localPos();

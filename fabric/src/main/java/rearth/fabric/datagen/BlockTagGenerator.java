@@ -42,6 +42,7 @@ public class BlockTagGenerator extends FabricTagProvider<Block> {
           .add(Blocks.DISPENSER);
         
         getOrCreateTagBuilder(TagContent.MELEE_DAMAGE)
+          .add(Blocks.MAGMA_BLOCK)
           .add(Blocks.CACTUS);
         
         getOrCreateTagBuilder(TagContent.PICKUP_TOOLS)

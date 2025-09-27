@@ -56,7 +56,12 @@ public class DroneController {
         serverData.getCurrentTask().tick();
         updateDroneMovement(player, serverData);
         
-        NetworkManager.sendToPlayer((ServerPlayerEntity) player, new NetworkContent.DroneMoveSyncPacket(serverData.currentPosition, serverData.currentRotation, serverData.droneData.getDroneId()));
+        // yes this gets players in 100 dist from all worlds, but I don't care
+        if (player.getWorld() instanceof ServerWorld serverWorld) {
+            var nearbyPlayers = serverWorld.getPlayers(candidate -> candidate.getPos().squaredDistanceTo(player.getPos()) < 10_000);
+            NetworkManager.sendToPlayers(nearbyPlayers, new NetworkContent.DroneMoveSyncPacket(serverData.currentPosition, serverData.currentRotation, serverData.droneData.getDroneId()));
+        }
+        
     }
     
     private static void updateDroneSensors(PlayerEntity player, DroneServerData serverData) {

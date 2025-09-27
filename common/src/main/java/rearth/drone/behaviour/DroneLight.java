@@ -55,15 +55,12 @@ public class DroneLight {
         if (!existingState.isOf(Blocks.LIGHT)) return;
         
         world.setBlockState(pos, Blocks.AIR.getDefaultState());
-        System.out.println("removing light: " + pos.toShortString());
     }
     
     private static void createDroneLight(DroneServerData data, BlockPos pos, World world) {
         
         var existingState = world.getBlockState(pos);
         if (!existingState.isAir()) return;
-        
-        System.out.println("creating light: " + pos.toShortString());
         
         world.setBlockState(pos, Blocks.LIGHT.getDefaultState());
         

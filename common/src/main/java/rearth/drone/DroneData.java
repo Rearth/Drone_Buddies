@@ -79,7 +79,7 @@ public class DroneData {
 //                abilities.add(DroneBehaviour.BlockFunctions.SAW);
 //            }
             
-            if (state.getLuminance() > 0) {
+            if (state.getLuminance() > 5) {
                 abilities.add(DroneBehaviour.BlockFunctions.LIGHT);
             }
             

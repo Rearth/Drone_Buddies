@@ -16,9 +16,12 @@ import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.client.sound.SoundManager;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -345,6 +348,7 @@ public class DroneCreatorScreen extends Screen {
         @Override
         public void onPress() {
             isPressed = true;
+            
             super.onPress();
         }
         
@@ -354,8 +358,19 @@ public class DroneCreatorScreen extends Screen {
             if (valid && isPressed)  {
                 isPressed = false;
                 this.parent.assembleDrone();
+                playUpSound(MinecraftClient.getInstance().getSoundManager());
             }
+            
             return valid;
+        }
+        
+        @Override
+        public void playDownSound(SoundManager soundManager) {
+            soundManager.play(PositionedSoundInstance.master(SoundEvents.BLOCK_NETHER_WOOD_PRESSURE_PLATE_CLICK_ON, 0.7F));
+        }
+        
+        public void playUpSound(SoundManager soundManager) {
+            soundManager.play(PositionedSoundInstance.master(SoundEvents.BLOCK_NETHER_WOOD_PRESSURE_PLATE_CLICK_OFF, 0.7F));
         }
         
         @SuppressWarnings("lossy-conversions")

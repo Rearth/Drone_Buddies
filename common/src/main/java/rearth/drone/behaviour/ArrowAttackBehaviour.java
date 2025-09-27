@@ -47,8 +47,8 @@ public class ArrowAttackBehaviour extends PlayerSwarmBehaviour {
         
         if (target.isRemoved() || !target.isAlive() || !target.isAttackable()) finishTask();
         
-        
-        var dist = drone.currentPosition.distanceTo(target.getEyePos());
+        var shotFrom = this.owner.getEyePos().add(0, 1.2, 0);
+        var dist = shotFrom.distanceTo(target.getEyePos());
         if (dist > MAX_RANGE) finishTask();
         
         if (attackCooldown <= 0) {
@@ -56,10 +56,10 @@ public class ArrowAttackBehaviour extends PlayerSwarmBehaviour {
             var world = owner.getWorld();
             var stack = new ItemStack(Items.ARROW);
             var targetPos = target.getEyePos().add(0, dist / 10f, 0);   // adjust target slightly up for longer distances to hit
-            var offset = targetPos.subtract(drone.currentPosition);
+            var offset = targetPos.subtract(shotFrom);
             var initialVelocity = offset.normalize().multiply(2);
             
-            var arrowEntity = new ArrowEntity(world, drone.currentPosition.x, drone.currentPosition.y, drone.currentPosition.z, stack, null);
+            var arrowEntity = new ArrowEntity(world, shotFrom.x, shotFrom.y, shotFrom.z, stack, null);
             arrowEntity.setVelocity(initialVelocity);
             world.spawnEntity(arrowEntity);
             

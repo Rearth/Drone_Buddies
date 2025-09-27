@@ -45,8 +45,6 @@ public class ControllerBlock extends BlockWithEntity {
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         
-        System.out.println("onUse client=" + world.isClient);
-        
         if (!world.isClient && player instanceof ServerPlayerEntity serverPlayer) {
             var candidate = world.getBlockEntity(pos, BlockEntitiesContent.ASSEMBLER_CONTROLLER.get());
             candidate.ifPresent(controllerBlockEntity ->
@@ -60,8 +58,6 @@ public class ControllerBlock extends BlockWithEntity {
     
     @Override
     protected ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        
-        System.out.println("onUseWithItem client=" + world.isClient);
         
         if (stack.isOf(ItemContent.POCKET_DRONE.get()) && stack.contains(ComponentContent.DRONE_DATA_TYPE.get())) {
             System.out.println("Loading pocket drone");

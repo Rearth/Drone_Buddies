@@ -20,6 +20,7 @@ import java.util.List;
 public class NetworkContent {
     
     public static void init() {
+        
         NetworkContent.registerS2C(DroneMoveSyncPacket.PAYLOAD_ID, DroneMoveSyncPacket.PACKET_CODEC, ((value, context) -> DronesClient.CURRENT_DATA.put(value.droneId(), value)));
         
         if (Platform.getEnvironment().equals(Env.SERVER))

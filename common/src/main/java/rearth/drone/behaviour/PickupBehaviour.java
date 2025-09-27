@@ -55,7 +55,7 @@ public class PickupBehaviour implements DroneBehaviour{
                 
             }
             case MOVING_HOME -> {
-                drone.targetPosition = owner.getEyePos();
+                drone.targetPosition = owner.getEyePos().add(0, 0.7, 0);
                 
                 if (collected && !target.isRemoved()) {
                     target.setPosition(drone.currentPosition);
