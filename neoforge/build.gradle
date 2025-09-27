@@ -49,8 +49,6 @@ dependencies {
     common(project(path: ':common', configuration: 'namedElements')) { transitive = false }
     shadowBundle project(path: ':common', configuration: 'transformProductionNeoForge')
 
-    include(modImplementation("earth.terrarium.olympus:olympus-neoforge-1.21:1.0.13"))
-
 }
 
 processResources {

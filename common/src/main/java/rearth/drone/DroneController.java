@@ -37,14 +37,8 @@ public class DroneController {
     
     public static void tickPlayer(ServerPlayerEntity playerEntity) {
         
-        var droneCandidate = playerEntity.getEquippedStack(EquipmentSlot.HEAD);
-        if (droneCandidate.isOf(ItemContent.POCKET_DRONE.get()) && droneCandidate.contains(ComponentContent.DRONE_DATA_TYPE.get())) {
-            var droneData = droneCandidate.get(ComponentContent.DRONE_DATA_TYPE.get());
-            if (droneData == null) return;
-            
-            var serverData = WORK_DATA.computeIfAbsent(droneData.getDroneId(), droneId -> new DroneServerData(droneData, playerEntity));
-            updateDrone(playerEntity, serverData);
-        }
+        var droneCandidate = getPlayerServerData(playerEntity);
+        droneCandidate.ifPresent(serverData -> updateDrone(playerEntity, serverData));
         
     }
     
@@ -161,7 +155,8 @@ public class DroneController {
         
         var droneCandidate = getDroneOfPlayer(playerEntity);
         if (playerEntity instanceof ServerPlayerEntity serverPlayer && droneCandidate.isPresent()) {
-            return Optional.of(new DroneServerData(droneCandidate.get(), serverPlayer));
+            var serverData = WORK_DATA.computeIfAbsent(droneCandidate.get().getDroneId(), droneId -> new DroneServerData(droneCandidate.get(), serverPlayer));
+            return Optional.of(serverData);
         }
         
         return Optional.empty();

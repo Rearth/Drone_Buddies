@@ -28,6 +28,7 @@ public final class DronesClient {
         
         RENDER_LAYERS.put(BlockContent.WOOD_ROTOR, RenderLayer.getCutout());
         RENDER_LAYERS.put(BlockContent.IRON_ROTOR, RenderLayer.getCutout());
+        RENDER_LAYERS.put(BlockContent.ION_THRUSTER, RenderLayer.getCutout());
         
     }
     

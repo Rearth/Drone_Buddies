@@ -30,6 +30,7 @@ public final class Drones {
         BlockEntitiesContent.BLOCK_ENTITIES.register();
         ItemContent.ITEMS.register();
         ComponentContent.COMPONENT_TYPES.register();
+        ItemGroups.TABS.register();
         
         TickEvent.SERVER_POST.register(event -> event.getWorlds().forEach(world -> world.getPlayers().forEach(DroneController::tickPlayer)));
         TickEvent.SERVER_PRE.register(event -> event.getWorlds().forEach(DroneLight::removeOldLights));

@@ -35,8 +35,8 @@ public class BlockTagGenerator extends FabricTagProvider<Block> {
           .add(Blocks.IRON_TRAPDOOR)
           .add(BlockContent.IRON_ROTOR.get());
         
-        getOrCreateTagBuilder(TagContent.ULTRA_THRUSTER)
-          .add(Blocks.BRICK_SLAB);
+        getOrCreateTagBuilder(TagContent.HIGH_THRUSTER)
+          .add(BlockContent.ION_THRUSTER.get());
         
         getOrCreateTagBuilder(TagContent.ARROW_LAUNCHER)
           .add(Blocks.DISPENSER);
@@ -48,7 +48,7 @@ public class BlockTagGenerator extends FabricTagProvider<Block> {
           .add(Blocks.LODESTONE);
         
         getOrCreateTagBuilder(TagContent.MINING_TOOLS)
-          .add(Blocks.IRON_BLOCK);
+          .add(BlockContent.DRILL.get());
         
     }
 }

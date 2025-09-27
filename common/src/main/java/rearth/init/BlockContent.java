@@ -10,10 +10,12 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.RegistryKeys;
 import rearth.Drones;
 import rearth.blocks.controller.ControllerBlock;
+import rearth.blocks.rotors.DrillBlock;
+import rearth.blocks.rotors.IonThruster;
 import rearth.blocks.rotors.IronRotor;
 import rearth.blocks.rotors.WoodenRotor;
 
-// todo drops, crafting recipes, tool assignments, random loot spawns?, creative tab
+// todo drops, crafting recipes, tool assignments, random loot spawns?
 
 public class BlockContent {
     
@@ -24,6 +26,8 @@ public class BlockContent {
     
     public static final RegistrySupplier<Block> WOOD_ROTOR = BLOCKS.register("wood_rotor", () -> new WoodenRotor(AbstractBlock.Settings.copy(Blocks.OAK_PLANKS).nonOpaque()));
     public static final RegistrySupplier<Block> IRON_ROTOR = BLOCKS.register("iron_rotor", () -> new IronRotor(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque()));
+    public static final RegistrySupplier<Block> ION_THRUSTER = BLOCKS.register("ion_thruster", () -> new IonThruster(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque()));
+    public static final RegistrySupplier<Block> DRILL = BLOCKS.register("drill", () -> new DrillBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque()));
     
     public static void registerItems() {
         
@@ -31,11 +35,13 @@ public class BlockContent {
         registerItem(ASSEMBLER_CONTROLLER, "controller");
         registerItem(WOOD_ROTOR, "wood_rotor");
         registerItem(IRON_ROTOR, "iron_rotor");
+        registerItem(ION_THRUSTER, "ion_thruster");
+        registerItem(DRILL, "drill");
     
     }
     
     private static void registerItem(RegistrySupplier<Block> block, String name) {
-        ItemContent.ITEMS.register(Drones.id(name), () -> new BlockItem(block.get(), new Item.Settings()));
+        ItemContent.ITEMS.register(Drones.id(name), () -> new BlockItem(block.get(), new Item.Settings().arch$tab(ItemGroups.DRONES_TAB)));
     }
     
 }

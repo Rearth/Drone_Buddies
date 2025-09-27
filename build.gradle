@@ -23,14 +23,6 @@ subprojects {
         archivesName = "$rootProject.archives_name-$project.name"
     }
 
-    repositories {
-        repositories {
-            maven {
-                url "https://maven.teamresourceful.com/repository/maven-public/"
-            }
-        }
-    }
-
     dependencies {
         minecraft "net.minecraft:minecraft:$rootProject.minecraft_version"
         mappings loom.layered {

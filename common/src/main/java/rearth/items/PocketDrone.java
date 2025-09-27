@@ -1,6 +1,7 @@
 package rearth.items;
 
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Equipment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -65,6 +66,7 @@ public class PocketDrone extends Item implements Equipment {
         
         tooltip.add(Text.literal(""));
         tooltip.add(Text.translatable("tooltip.drones.equip_hint").formatted(Formatting.ITALIC, Formatting.GRAY));
+        
         
         super.appendTooltip(stack, context, tooltip, type);
     }

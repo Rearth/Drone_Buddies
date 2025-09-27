@@ -112,7 +112,7 @@ public class DroneCreatorScreen extends Screen {
         var backgroundStartX = centerX - (300 / 2);
         var backgroundStartY = centerY - (183 / 2);
         
-        context.drawTexture(BACKGROUND_TEXTURE, backgroundStartX, backgroundStartY, 10, 0, 0, 300, 183, 300, 183);
+        context.drawTexture(BACKGROUND_TEXTURE, backgroundStartX, backgroundStartY, 0, 0, 0, 300, 183, 300, 183);
         
         for (var pair : droneData.getBlocks()) {
             var entity = renderedEntities.get(pair.localPos());

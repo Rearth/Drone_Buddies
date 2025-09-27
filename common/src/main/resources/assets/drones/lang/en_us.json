@@ -15,5 +15,12 @@
   "drone.message.invalid_drone": "Invalid Drone",
   "drone.message.invalid_drone_desc": "Please check your drone configuration.",
   "drone.message.assembled": "Drone Assembled",
-  "drone.message.assembled_desc": "The drone has been added to your inventory."
+  "drone.message.assembled_desc": "The drone has been added to your inventory.",
+  "category.drones.main_group": "Buddy Drones!",
+  "block.drones.frame": "Assembly Frame",
+  "block.drones.controller": "Drone Assembly Controller",
+  "block.drones.wood_rotor": "Wooden Rotor",
+  "block.drones.iron_rotor": "Advanced Rotor",
+  "block.drones.ion_thruster": "Ion Thruster",
+  "block.drones.drill": "Drill"
 }
