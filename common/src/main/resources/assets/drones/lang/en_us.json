@@ -32,5 +32,6 @@
   "block.drones.wood_rotor": "Wooden Rotor",
   "block.drones.iron_rotor": "Advanced Rotor",
   "block.drones.ion_thruster": "Ion Thruster",
-  "block.drones.drill": "Drill"
+  "block.drones.drill": "Drill",
+  "tooltip.drones.builder": "Used to create a modular drone buddy. Place this next to an assembly frame, and then build a drone on that frame."
 }
