@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "item": "minecraft:repeater"
+    },
+    "c": {
+      "item": "minecraft:iron_ingot"
+    },
+    "f": {
+      "item": "minecraft:smooth_stone"
+    },
+    "m": {
+      "tag": "minecraft:logs"
+    },
+    "s": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "pattern": [
+    "fff",
+    "mcm",
+    "sbs"
+  ],
+  "result": {
+    "count": 1,
+    "id": "drones:frame"
+  }
+}

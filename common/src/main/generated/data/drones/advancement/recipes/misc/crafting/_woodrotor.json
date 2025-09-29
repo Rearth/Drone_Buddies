@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "drones:crafting/_woodrotor"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_wood_rotor": {
+      "conditions": {
+        "items": [
+          {
+            "items": "drones:wood_rotor"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_wood_rotor"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "drones:crafting/_woodrotor"
+    ]
+  }
+}

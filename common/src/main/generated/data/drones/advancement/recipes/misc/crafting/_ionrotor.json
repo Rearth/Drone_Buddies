@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_ion_thruster": {
+      "conditions": {
+        "items": [
+          {
+            "items": "drones:ion_thruster"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "drones:crafting/_ionrotor"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_ion_thruster"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "drones:crafting/_ionrotor"
+    ]
+  }
+}

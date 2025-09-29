@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "item": "minecraft:smooth_stone"
+    },
+    "c": {
+      "item": "minecraft:iron_ingot"
+    },
+    "f": {
+      "item": "minecraft:smooth_stone"
+    },
+    "m": {
+      "tag": "minecraft:logs"
+    },
+    "s": {
+      "item": "minecraft:smooth_stone"
+    }
+  },
+  "pattern": [
+    "fff",
+    "mcm",
+    "sbs"
+  ],
+  "result": {
+    "count": 6,
+    "id": "drones:frame"
+  }
+}

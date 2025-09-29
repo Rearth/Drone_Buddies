@@ -15,9 +15,7 @@ public class BlockLootGenerator extends FabricBlockLootTableProvider {
     
     @Override
     public void generate() {
-        System.out.println("adding block loots");
         for (var blockSupplier : BlockContent.BLOCKS) {
-            System.out.println(blockSupplier.get());
             addDrop(blockSupplier.get());
         }
     }

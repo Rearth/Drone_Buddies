@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "m": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "pattern": [
+    "m  ",
+    "mmm",
+    "m  "
+  ],
+  "result": {
+    "count": 1,
+    "id": "drones:drill"
+  }
+}

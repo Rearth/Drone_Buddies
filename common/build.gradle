@@ -10,6 +10,18 @@ sourceSets {
     }
 }
 
+tasks.named('processResources') {
+
+    from("$rootDir/docs") {
+        into "assets/oracle_index/books/drones"
+        exclude '.assets/item/**'   // items are rendered ingame as actual item components, no need to include them here
+    }
+
+    doLast {
+        println "processResources executed: wiki folder copied into assets/oracle_index"
+    }
+}
+
 dependencies {
     // We depend on Fabric Loader here to use the Fabric @Environment annotations,
     // which get remapped to the correct annotations on each platform.
