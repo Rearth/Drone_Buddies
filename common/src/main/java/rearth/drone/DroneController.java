@@ -2,6 +2,7 @@ package rearth.drone;
 
 import dev.architectury.event.EventResult;
 import dev.architectury.networking.NetworkManager;
+import dev.architectury.platform.Platform;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -176,6 +177,22 @@ public class DroneController {
             
             return Optional.of(droneData);
             
+        }
+        
+        if (Platform.isModLoaded("accessories") && playerEntity.accessoriesCapability() != null && playerEntity.accessoriesCapability().getContainers() != null) {
+            var headCosmetic = playerEntity.accessoriesCapability().getContainers().get("accessories:head");
+            
+            if (headCosmetic == null || headCosmetic.getCosmeticAccessories().heldStacks.isEmpty())
+                
+                return Optional.empty();
+            var candidate = headCosmetic.getCosmeticAccessories().heldStacks.getFirst();
+            if (candidate.isOf(ItemContent.POCKET_DRONE.get()) && candidate.contains(ComponentContent.DRONE_DATA_TYPE.get())) {
+                var droneData = candidate.get(ComponentContent.DRONE_DATA_TYPE.get());
+                if (droneData == null) return Optional.empty();
+                
+                return Optional.of(droneData);
+                
+            }
         }
         
         return Optional.empty();

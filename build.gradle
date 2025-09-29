@@ -31,6 +31,10 @@ subprojects {
         }
     }
 
+    repositories {
+        maven { url 'https://maven.wispforest.io/releases' }
+    }
+
     java {
         // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
         // if it is present.
