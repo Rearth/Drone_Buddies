@@ -1,17 +1,17 @@
 modLoader = "javafml"
 loaderVersion = "[4,)"
-#issueTrackerURL = ""
-license = "Insert License Here"
+issueTrackerURL = "https://github.com/Rearth/Drone_Buddies/issues"
+license = "CC-BY-4.0"
 
 [[mods]]
 modId = "drones"
 version = "${version}"
 displayName = "Modular Drones"
-authors = "Me!"
+authors = "Me! - rearth"
 description = '''
-This is an example description! Tell everyone what your mod is about!
+Small mod that allows the player to build modular drones.
 '''
-#logoFile = ""
+logoFile = "assets/drones/icon.png"
 
 [[dependencies.drones]]
 modId = "neoforge"
