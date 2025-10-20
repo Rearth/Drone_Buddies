@@ -182,16 +182,18 @@ public class DroneController {
         if (Platform.isModLoaded("accessories") && playerEntity.accessoriesCapability() != null && playerEntity.accessoriesCapability().getContainers() != null) {
             var headCosmetic = playerEntity.accessoriesCapability().getContainers().get("accessories:head");
             
-            if (headCosmetic == null || headCosmetic.getCosmeticAccessories().heldStacks.isEmpty())
-                
+            if (headCosmetic == null)
                 return Optional.empty();
-            var candidate = headCosmetic.getCosmeticAccessories().heldStacks.getFirst();
-            if (candidate.isOf(ItemContent.POCKET_DRONE.get()) && candidate.contains(ComponentContent.DRONE_DATA_TYPE.get())) {
-                var droneData = candidate.get(ComponentContent.DRONE_DATA_TYPE.get());
-                if (droneData == null) return Optional.empty();
-                
-                return Optional.of(droneData);
-                
+            
+            for (var pair : headCosmetic.getCosmeticAccessories()) {
+                var candidate = pair.getSecond();
+                if (candidate.isOf(ItemContent.POCKET_DRONE.get()) && candidate.contains(ComponentContent.DRONE_DATA_TYPE.get())) {
+                    
+                    var droneData = candidate.get(ComponentContent.DRONE_DATA_TYPE.get());
+                    if (droneData == null) return Optional.empty();
+                    return Optional.of(droneData);
+                    
+                }
             }
         }
         
