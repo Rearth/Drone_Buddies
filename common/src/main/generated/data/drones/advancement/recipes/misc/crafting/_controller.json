@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_frame": {
+    "has_controller": {
       "conditions": {
         "items": [
           {
-            "items": "drones:frame"
+            "items": "drones:controller"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_frame"
+      "has_controller"
     ]
   ],
   "rewards": {

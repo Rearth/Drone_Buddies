@@ -27,7 +27,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
     public void generate(RecipeExporter exp) {
         
         // controller
-        offerFrameRecipe(exp, BlockContent.ASSEMBLER_FRAME.get().asItem(), Ingredient.ofItems(Items.REPEATER), Ingredient.ofItems(Items.REDSTONE), Ingredient.fromTag(ItemTags.LOGS), Ingredient.ofItems(Items.IRON_INGOT), Ingredient.ofItems(Items.SMOOTH_STONE), 1, "_controller");
+        offerFrameRecipe(exp, BlockContent.ASSEMBLER_CONTROLLER.get().asItem(), Ingredient.ofItems(Items.REPEATER), Ingredient.ofItems(Items.REDSTONE), Ingredient.fromTag(ItemTags.LOGS), Ingredient.ofItems(Items.IRON_INGOT), Ingredient.ofItems(Items.SMOOTH_STONE), 1, "_controller");
         
         // frame
         offerFrameRecipe(exp, BlockContent.ASSEMBLER_FRAME.get().asItem(), Ingredient.ofItems(Items.SMOOTH_STONE), Ingredient.ofItems(Items.SMOOTH_STONE), Ingredient.fromTag(ItemTags.LOGS), Ingredient.ofItems(Items.IRON_INGOT), Ingredient.ofItems(Items.SMOOTH_STONE), 6, "_frame");
