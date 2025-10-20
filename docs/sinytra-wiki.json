@@ -1,6 +1,7 @@
 {
   "id": "drones",
   "platforms": {
-    "curseforge": "buddy-drones"
+    "curseforge": "buddy-drones",
+    "modrinth": "buddy-drones"
   }
 }
